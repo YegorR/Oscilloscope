@@ -24,10 +24,19 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+        channel.cpp \
+        globalchannellistview.cpp \
+        ichannel.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        channel.h \
+        channellist.h \
+        dublicatechannel.h \
+        globalchannellist.h \
+        globalchannellistview.h \
+        ichannel.h \
         mainwindow.h
 
 FORMS += \
