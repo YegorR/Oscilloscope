@@ -1,3 +1,0 @@
-Oscilloscope
-Readme.MD
-text.txt
