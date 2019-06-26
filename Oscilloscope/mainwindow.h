@@ -1,22 +1,30 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
 #include <QMainWindow>
+#include <QList>
+#include "simplescope.h"
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+namespace oscilloscope {
+    class MainWindow : public QMainWindow {
+        Q_OBJECT
 
-public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    public:
+        explicit MainWindow(QWidget *parent = 0);     
 
-private:
-    Ui::MainWindow *ui;
-};
+        ~MainWindow();
 
-#endif // MAINWINDOW_H
+    private slots:
+        void on_createSimpleScope_pressed();
+        void updateScopes();
+
+    private:
+        Ui::MainWindow *ui;
+        QList<simplescope *> _scopes;
+
+        int countScopes;
+    };
+}
+
+
