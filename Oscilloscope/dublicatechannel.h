@@ -5,7 +5,8 @@
 #include <ichannel.h>
 
 class DublicateChannel : public iChannel {
-    DublicateChannel();
+public:
+    DublicateChannel(double x, double y, QString channelName);
 };
 
 #endif // DUBLICATECHANNEL_H

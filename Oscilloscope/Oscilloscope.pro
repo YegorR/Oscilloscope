@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         channel.cpp \
+        dublicatechannel.cpp \
         globalchannellistview.cpp \
         ichannel.cpp \
         main.cpp \

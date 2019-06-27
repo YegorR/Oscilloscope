@@ -2,7 +2,6 @@
 #define CHANNELLIST_H
 
 #pragma once
-//#include <ichannel.h>
 #include <QList>
 #include <QString>
 
