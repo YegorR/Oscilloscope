@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,10 +25,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+        ChannelController/channelcontroller.cpp \
+        ChannelController/frameparser.cpp \
+        ChannelController/server.cpp \
+        ChannelController/tcpclient.cpp \
+        ChannelController/tcpserver.cpp \
         main.cpp \
         mainwindow.cpp
 
 HEADERS += \
+        ChannelController/channelcontroller.h \
+        ChannelController/frame.h \
+        ChannelController/frameparser.h \
+        ChannelController/server.h \
+        ChannelController/tcpclient.h \
+        ChannelController/tcpserver.h \
         mainwindow.h
 
 FORMS += \
