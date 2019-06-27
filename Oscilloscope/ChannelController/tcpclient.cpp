@@ -5,9 +5,10 @@ TcpClient::TcpClient(QTcpSocket* socket, QObject* parent) : QObject (parent), _s
   connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 }
 
-QByteArray TcpClient::read()
+Frame* TcpClient::read()
 {
-  return _socket->readAll();
+  QByteArray data =  _socket->readAll();
+  return _parser.parse(data);
 }
 
 void TcpClient::readyRead()
@@ -19,3 +20,4 @@ TcpClient::~TcpClient() {
   _socket->close();
   delete _socket;
 }
+

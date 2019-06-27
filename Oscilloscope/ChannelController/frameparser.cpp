@@ -110,8 +110,10 @@ QString readString(QDataStream& stream) {
       stream.readBytes(charString, realSize);
       QString result = QString::fromLocal8Bit(charString);
       delete [] charString;
+      stream.skipRawData((realSize + 1) % 4);
       return result;
     } else {
+      stream.skipRawData(3);
       return QString();
     }
 }

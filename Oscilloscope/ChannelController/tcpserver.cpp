@@ -31,5 +31,6 @@ void TCPServer::receiveConnection() {
 }
 
 void TCPServer::receiveData(TcpClient* client) {
-  QByteArray data = client->read();
+  Frame* newFrame = client->read();
+  frame(*newFrame);
 }

@@ -5,20 +5,23 @@
 #include <QVector>
 #include "frame.h"
 #include "server.h"
+#include "globalchannellist.h"
 
 class ChannelController : public QObject
 {
   Q_OBJECT
 
 private:
-  QVector<Server> _servers;
+  Server* _tcpServer = nullptr;
+  //Server& _udpServer;
+  GlobalChannelList _globalChannelList;
 public:
   explicit ChannelController(QObject *parent = nullptr);
-
+  bool createTcpServer(quint16 port);
 signals:
 
 private slots:
-  void receiveFrame(Frame&);
+  void receiveFrame(Frame*);
 };
 
 #endif // CHANNELCONTROLLER_H

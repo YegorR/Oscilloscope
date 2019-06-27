@@ -4,13 +4,17 @@
 #include <QObject>
 #include <QTcpSocket>
 
+#include "frame.h"
+#include "frameparser.h"
+
 class TcpClient : public QObject
 {
 private:
   QTcpSocket* _socket;
+  FrameParser _parser;
 public:
   TcpClient(QTcpSocket* client, QObject* parent = nullptr);
-  QByteArray read();
+  Frame* read();
   ~TcpClient();
 signals:
   void readyRead(TcpClient*);

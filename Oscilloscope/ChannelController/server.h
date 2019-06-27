@@ -18,8 +18,7 @@ public:
   virtual bool start() = 0;
   virtual void stop() = 0;
 signals:
-  void frame(Frame&);
-public slots:
+  void frame(Frame*);
 };
 
 #endif // SERVER_H
