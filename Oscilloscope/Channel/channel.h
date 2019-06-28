@@ -1,11 +1,11 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
+#pragma once
+#include <dublicatechannel.h>
+#include <ichannel.h>
 #include <QTimer>
 #include <QList>
-
-#include <Channel/dublicatechannel.h>
-#include <Channel/ichannel.h>
 
 class Channel : public iChannel{
 private:
@@ -14,7 +14,7 @@ private:
     bool _alive;
 
 public:   
-    Channel(double x, double y, QString channelName);
+    Channel(DataStream *data);
     void channelDublicate();
     void updateStatus(); //функция используется как слот для изменения состояния _alive при сигнале таймера
 };
