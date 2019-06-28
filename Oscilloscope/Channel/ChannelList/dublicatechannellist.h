@@ -3,15 +3,14 @@
 
 #include <QList>
 
-#include <ChannelList/channellist.h>
-#include <dublicatechannel.h>
+#include <Channel/ChannelList/channellist.h>
+#include <Channel/dublicatechannel.h>
 
 namespace oscilloscope
 {
     class DublicateChannelList : public ChannelList
     {
-    private:
-        QList<DublicateChannel*> _dublicateChannelas;
+
     };
 }
 

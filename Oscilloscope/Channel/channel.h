@@ -1,11 +1,11 @@
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#pragma once
-#include <dublicatechannel.h>
-#include <ichannel.h>
 #include <QTimer>
 #include <QList>
+
+#include <Channel/dublicatechannel.h>
+#include <Channel/ichannel.h>
 
 class Channel : public iChannel{
 private:

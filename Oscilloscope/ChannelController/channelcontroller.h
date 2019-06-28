@@ -5,7 +5,7 @@
 #include <QVector>
 #include "frame.h"
 #include "server.h"
-#include "globalchannellist.h"
+#include "Channel/ChannelList/globalchannellist.h"
 
 class ChannelController : public QObject
 {

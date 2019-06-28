@@ -1,4 +1,4 @@
-#include "channel.h"
+#include "Channel/channel.h"
 
 Channel::Channel(double x, double y, QString channelName) : iChannel(x, y, channelName){
     _channelType = "Original";

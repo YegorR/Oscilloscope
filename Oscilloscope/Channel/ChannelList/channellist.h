@@ -3,12 +3,13 @@
 
 #include <QList>
 #include <QString>
+#include <QObject>
 
-#include <ichannel.h>
+#include <Channel/ichannel.h>
 
 namespace oscilloscope
 {
-    class ChannelList
+    class ChannelList : public QObject
     {
         Q_OBJECT
 
@@ -16,10 +17,16 @@ namespace oscilloscope
         ChannelList(iChannel* ch);
         virtual ~ChannelList();
 
+        void addChannel(iChannel* ch);
+
         int indexOfChannel(QString channelName);
         iChannel* channelByName(QString channelName);
-        void addChannel(iChannel* ch);
         QList<iChannel*> channels();
+
+    signals:
+        void deleteChannel(iChannel* ch);
+
+    public slots:
 
     protected:
         QList<iChannel*>_channelList;
