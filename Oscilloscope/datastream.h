@@ -2,7 +2,7 @@
 #define DATASTREAM_H
 
 #include <QMutex>
-#include "frame.h"
+#include "ChannelController/frame.h"
 
 class DataStream
 {
