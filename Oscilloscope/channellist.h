@@ -1,18 +1,32 @@
 #ifndef CHANNELLIST_H
 #define CHANNELLIST_H
 
-#pragma once
 #include <QList>
 #include <QString>
 
-class iChannel;
-class ChannelList{
-private:
-    QList<iChannel*> _channels;
-public:
-    void add(iChannel ch);
-    QList<iChannel*> channels();
-    iChannel* channelByName(QString channelName);
-};
+#include <ichannel.h>
+
+// xcxz
+
+namespace oscilloscope
+{
+    class ChannelList
+    {
+        Q_OBJECT
+
+    public:
+        int indexOfChannel(QString channelName);
+        iChannel* channelByName(QString channelName);
+        void addChannel(iChannel* ch);
+        QList<iChannel*> channels();
+
+    protected:
+        QList<iChannel*>_channelList;
+
+    private:
+        ChannelList(iChannel* ch);
+        virtual ~ChannelList();
+    };
+}
 
 #endif // CHANNELLIST_H
