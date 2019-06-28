@@ -23,7 +23,13 @@ SOURCES += \
         globalchannellistview.cpp \
         ichannel.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        datastream.cpp \
+        ChannelController\channelcontroller.cpp \
+        ChannelController\frameparser.cpp \
+        ChannelController\server.cpp \
+        ChannelController\tcpclient.cpp \
+        ChannelController\tcpserver.cpp
 
 HEADERS += \
         channel.h \
@@ -32,7 +38,13 @@ HEADERS += \
         globalchannellist.h \
         globalchannellistview.h \
         ichannel.h \
-        mainwindow.h
+        mainwindow.h \
+        datastream.h \
+        ChannelController\channelcontroller.h \
+        ChannelController\frameparser.h \
+        ChannelController\server.h \
+        ChannelController\tcpclient.h \
+        ChannelController\tcpserver.h
 
 FORMS += \
         mainwindow.ui
