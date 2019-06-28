@@ -1,14 +1,14 @@
-#ifndef LOCALCHANNELLIST_H
-#define LOCALCHANNELLIST_H
+#ifndef LOCALCHANNELLISTVIEW_H
+#define LOCALCHANNELLISTVIEW_H
 
 #include <QList>
 
-#include <attributes.h>
-#include <channellist.h>
+#include <ChannelList/ChannelAttributes/attributes.h>
+#include <ChannelList/channellist.h>
 
 namespace oscilloscope
 {
-    class LocalChannelList : public ChannelList
+    class LocalChannelListView
     {
     public:
         void deleteChannelForLocalList(iChannel* ch);
@@ -27,4 +27,4 @@ namespace oscilloscope
     };
 }
 
-#endif // LOCALCHANNELLIST_H
+#endif // LOCALCHANNELLISTVIEW_H
