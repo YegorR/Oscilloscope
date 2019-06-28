@@ -15,7 +15,7 @@ bool ChannelController::createTcpServer(quint16 port) {
       _tcpServer->disconnect();
       delete _tcpServer;
     }
-  _tcpServer = new TCPServer(port, this);
+  _tcpServer = new TcpServer(port, this);
   connect(_tcpServer, SIGNAL(frame(Frame*)), this, SLOT(receiveFrame(Frame*)));
   return _tcpServer->start();
 }
