@@ -2,7 +2,7 @@
 #define ICHANNEL_H
 
 #pragma once
-#include <channellist.h>
+// #include <channellist.h>
 #include <QVector>
 #include <QString>
 #include <QObject>
@@ -20,7 +20,7 @@ private:
     QVector <QVector<double>> _points;
     QString _nickname;
     template<typename T>
-    QVector <QVector<double>> transformType(QVector <QVector<T>> *points);
+    QVector <QVector<double>> transformType(QVector <QVector<T>> *points);    
 protected:
     QString _channelType; //В конструкторах channel и dublicateChannel будут определяться разные значения для _channelType
     double x, y;        //временная замена для Data
