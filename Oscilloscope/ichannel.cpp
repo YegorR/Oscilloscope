@@ -15,7 +15,8 @@ QString iChannel::channelType(){
     return _channelType;
 }
 
-QVector <QVector<double>> iChannel::transformType(QVector <QVector<double>> *points){
+template <typename T>
+QVector <QVector<double>> iChannel::transformType(QVector <QVector<T>> *points){
     //какие-то преобразования
     return _points;
 }
