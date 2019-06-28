@@ -1,13 +1,17 @@
 #ifndef GLOBALCHANNELLIST_H
 #define GLOBALCHANNELLIST_H
 
-#pragma once
-//#include<globalchannellistview.h>
+#include <channellist.h>
 
-class GlobalChannelListView;
-class GlobalChannelList : public channellist{
-private:
-    GlobalChannelListView *_channelsView;
-};
+namespace oscilloscope
+{
+    class GlobalChannelList : public ChannelList
+    {
+    public:
+        GlobalChannelList(iChannel* ch);
 
+        void deleteChannel(QString channelName);
+        void deleteGlobalList();
+    };
+}
 #endif // GLOBALCHANNELLIST_H
