@@ -6,8 +6,6 @@
 
 #include <ichannel.h>
 
-// xcxz
-
 namespace oscilloscope
 {
     class ChannelList
@@ -15,6 +13,9 @@ namespace oscilloscope
         Q_OBJECT
 
     public:
+        ChannelList(iChannel* ch);
+        virtual ~ChannelList();
+
         int indexOfChannel(QString channelName);
         iChannel* channelByName(QString channelName);
         void addChannel(iChannel* ch);
@@ -22,10 +23,6 @@ namespace oscilloscope
 
     protected:
         QList<iChannel*>_channelList;
-
-    private:
-        ChannelList(iChannel* ch);
-        virtual ~ChannelList();
     };
 }
 
