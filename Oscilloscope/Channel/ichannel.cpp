@@ -1,10 +1,8 @@
-#include "Channel/ichannel.h"
+#include "ichannel.h"
 
-iChannel::iChannel(double x1, double y1, QString channelName1)
+iChannel::iChannel(DataStream *data)
 {
-    x = x1;
-    y = y1;
-    _channelName = channelName1;
+    _data = data;
 }
 
 QString iChannel::nickname(){
@@ -19,4 +17,8 @@ template <typename T>
 QVector <QVector<double>> iChannel::transformType(QVector <QVector<T>> *points){
     //какие-то преобразования
     return _points;
+}
+
+QString iChannel::channelName(){
+    return _data->channelName();
 }
