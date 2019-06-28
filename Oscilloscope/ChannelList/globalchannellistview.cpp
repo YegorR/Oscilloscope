@@ -1,4 +1,4 @@
-#include <globalchannellistview.h>
+#include <ChannelList/globalchannellistview.h>
 
 void GlobalChannelListView::deleteChannel(QString channelName){
 

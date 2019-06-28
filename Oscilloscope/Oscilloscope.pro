@@ -19,11 +19,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         channel.cpp \
-        channellist.cpp \
+        ChannelList\channellist.cpp \
         dublicatechannel.cpp \
-        globalchannellistview.cpp \
+        ChannelList\globalchannellistview.cpp \
         ichannel.cpp \
-        localchannellist.cpp \
+        ChannelList\localchannellistview.cpp \
         main.cpp \
         mainwindow.cpp \
         datastream.cpp \
@@ -34,14 +34,15 @@ SOURCES += \
         ChannelController\tcpserver.cpp
 
 HEADERS += \
-        attributes.h \
+        ChannelList\ChannelAttributes\attributes.h \
         channel.h \
-        channellist.h \
+        ChannelList\channellist.h \
         dublicatechannel.h \
-        globalchannellist.h \
-        globalchannellistview.h \
+        ChannelList\dublicatechannellist.h \
+        ChannelList\globalchannellist.h \
+        ChannelList\globalchannellistview.h \
         ichannel.h \
-        localchannellist.h \
+        ChannelList\localchannellistview.h \
         mainwindow.h \
         datastream.h \
         ChannelController\channelcontroller.h \
