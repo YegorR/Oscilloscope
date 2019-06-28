@@ -1,5 +1,5 @@
-#include <Channel/dublicatechannel.h>
+#include <dublicatechannel.h>
 
-DublicateChannel::DublicateChannel(double x, double y, QString channelName) : iChannel(x, y, channelName){
+DublicateChannel::DublicateChannel(DataStream *data) : iChannel(data){
     _channelType = "Dublicate";
 }
