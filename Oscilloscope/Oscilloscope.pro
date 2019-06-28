@@ -1,4 +1,5 @@
 QT       += core gui
+QT       += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -29,7 +30,8 @@ SOURCES += \
         ChannelController\frameparser.cpp \
         ChannelController\server.cpp \
         ChannelController\tcpclient.cpp \
-        ChannelController\tcpserver.cpp
+        ChannelController\tcpserver.cpp \
+        ChannelController\frame.cpp
 
 HEADERS += \
         channel.h \
@@ -44,7 +46,8 @@ HEADERS += \
         ChannelController\frameparser.h \
         ChannelController\server.h \
         ChannelController\tcpclient.h \
-        ChannelController\tcpserver.h
+        ChannelController\tcpserver.h \
+        ChannelController\frame.h
 
 FORMS += \
         mainwindow.ui

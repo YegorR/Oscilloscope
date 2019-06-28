@@ -14,7 +14,7 @@ private:
     bool _alive;
 
 public:   
-    Channel(double x, double y, QString channelName);
+    Channel(DataStream *data);
     void channelDublicate();
     void updateStatus(); //функция используется как слот для изменения состояния _alive при сигнале таймера
 };
