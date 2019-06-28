@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+        Channel/ChannelList/dublicatechannellist.cpp \
         Channel\channel.cpp \
         Channel\ChannelList\channellist.cpp \
         Channel\dublicatechannel.cpp \

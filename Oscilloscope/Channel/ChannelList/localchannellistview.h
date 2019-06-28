@@ -1,10 +1,12 @@
 #ifndef LOCALCHANNELLISTVIEW_H
 #define LOCALCHANNELLISTVIEW_H
 
+#include <QListWidget>
 #include <QList>
 
-#include <ChannelList/ChannelAttributes/attributes.h>
-#include <ChannelList/channellist.h>
+#include <Channel/ChannelList/ChannelAttributes/attributes.h>
+#include <Channel/ChannelList/dublicatechannellist.h>
+#include <Channel/ChannelList/globalchannellistview.h>
 
 namespace oscilloscope
 {
@@ -18,12 +20,9 @@ namespace oscilloscope
         void takeObject(); // Drag and Drop
 
     private:
-        LocalChannelList(iChannel* ch);
-        LocalChannelList(iChannel* ch, Attributes atr);
-        ~LocalChannelList();
-
         QList<Attributes> _attributes;
-        // LocalChannelListView _channelView;
+        DublicateChannelList *_dublicateChannels;
+        GlobalChannelList *_channelView;
     };
 }
 

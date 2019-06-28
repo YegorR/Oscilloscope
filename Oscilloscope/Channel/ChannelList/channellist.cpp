@@ -1,15 +1,21 @@
-#include <ChannelList/channellist.h>
+#include <Channel/ChannelList/channellist.h>
 
 namespace oscilloscope
 {
     ChannelList::ChannelList(iChannel* ch)
     {
+        connect(this, SIGNAL(deleteChannel(*ch)), iChannel, SLOT());
         _channelList << ch;
     }
 
     ChannelList::~ChannelList()
     {
         _channelList.clear();
+    }
+
+    void ChannelList::addChannel(iChannel* ch)
+    {
+        _channelList << ch;
     }
 
     int ChannelList::indexOfChannel(QString channelName)
@@ -24,11 +30,6 @@ namespace oscilloscope
     iChannel* ChannelList::channelByName(QString channelName)
     {
         return _channelList[this->indexOfChannel(channelName)];
-    }
-
-    void ChannelList::addChannel(iChannel* ch)
-    {
-        _channelList << ch;
     }
 
     QList<iChannel*> ChannelList::channels()

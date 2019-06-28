@@ -1,16 +1,10 @@
 #ifndef GLOBALCHANNELLISTVIEW_H
 #define GLOBALCHANNELLISTVIEW_H
 
-#pragma once
-#include <QString>
-#include <QVector>
-#include <globalchannellist.h>
+#include <Channel/channel.h>
 
-class GlobalChannelListView{
-public:
-    void deleteChannel(QString channelName);
-private:
-    QVector<GlobalChannelList> _channels;
-};
+namespace oscilloscope {
+
+}
 
 #endif // GLOBALCHANNELLISTVIEW_H

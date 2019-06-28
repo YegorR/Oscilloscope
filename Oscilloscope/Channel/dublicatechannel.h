@@ -2,7 +2,7 @@
 #define DUBLICATECHANNEL_H
 
 #pragma once
-#include <ichannel.h>
+#include <Channel/ichannel.h>
 
 class DublicateChannel : public iChannel {
 public:

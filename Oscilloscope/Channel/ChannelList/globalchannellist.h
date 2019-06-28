@@ -1,7 +1,7 @@
 #ifndef GLOBALCHANNELLIST_H
 #define GLOBALCHANNELLIST_H
 
-#include <ChannelList/channellist.h>
+#include <Channel/ChannelList/channellist.h>
 
 namespace oscilloscope
 {

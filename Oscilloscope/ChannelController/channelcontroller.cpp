@@ -1,6 +1,6 @@
 #include "channelcontroller.h"
 #include "tcpserver.h"
-#include "channel.h"
+#include "Channel/channel.h"
 #include "frame.h"
 #include "datastream.h"
 

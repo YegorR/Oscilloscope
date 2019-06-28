@@ -1,4 +1,4 @@
-#include <ChannelList/localchannellistview.h>
+#include <Channel/ChannelList/localchannellistview.h>
 
 namespace oscilloscope
 {

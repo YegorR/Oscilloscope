@@ -1,11 +1,12 @@
 #ifndef ICHANNEL_H
 #define ICHANNEL_H
 
-#pragma once
-// #include <channellist.h>
 #include <QVector>
+#include <QList>
 #include <QString>
 #include <QObject>
+
+// #include <Channel/ChannelList/channellist.h>
 
 class iChannel : public QObject{
     Q_OBJECT
@@ -15,8 +16,9 @@ public:
     /*QVector<Data> data()*/
     QString nickname();
     QString channelType();
+
 private:
-    QVector<ChannelList*> _list;
+    QList<ChannelList*> _list;
     QVector <QVector<double>> _points;
     QString _nickname;
     template<typename T>

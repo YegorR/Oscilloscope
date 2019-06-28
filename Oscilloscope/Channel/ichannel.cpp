@@ -1,4 +1,4 @@
-#include "ichannel.h"
+#include "Channel/ichannel.h"
 
 iChannel::iChannel(double x1, double y1, QString channelName1)
 {
