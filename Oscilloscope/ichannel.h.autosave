@@ -19,7 +19,8 @@ private:
     QVector<ChannelList*> _list;
     QVector <QVector<double>> _points;
     QString _nickname;
-    QVector <QVector<double>> transformType(QVector <QVector<double>> *points);    
+    template<typename T>
+    QVector <QVector<double>> transformType(QVector <QVector<T>> *points);    
 protected:
     QString _channelType; //В конструкторах channel и dublicateChannel будут определяться разные значения для _channelType
     double x, y;        //временная замена для Data

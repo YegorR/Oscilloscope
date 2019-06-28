@@ -2,10 +2,10 @@
 #define GLOBALCHANNELLIST_H
 
 #pragma once
-//#include<globalchannellistview.h>
+#include<channellist.h>
 
 class GlobalChannelListView;
-class GlobalChannelList : public channellist{
+class GlobalChannelList : public ChannelList{
 private:
     GlobalChannelListView *_channelsView;
 };
