@@ -1,10 +1,9 @@
 #ifndef GLOBALCHANNELLISTVIEW_H
 #define GLOBALCHANNELLISTVIEW_H
 
-#pragma once
+
 #include <QString>
 #include <QVector>
-#include <globalchannellist.h>
 
 class GlobalChannelListView{
 public:

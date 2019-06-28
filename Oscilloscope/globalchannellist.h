@@ -2,6 +2,7 @@
 #define GLOBALCHANNELLIST_H
 
 #include <channellist.h>
+#include <globalchannellistview.h>
 
 namespace oscilloscope
 {
@@ -9,6 +10,7 @@ namespace oscilloscope
     {
     public:
         GlobalChannelList(iChannel* ch);
+        ~GlobalChannelList();
 
         void deleteChannel(QString channelName);
         void deleteGlobalList();

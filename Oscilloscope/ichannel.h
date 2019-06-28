@@ -2,7 +2,7 @@
 #define ICHANNEL_H
 
 #pragma once
-#include <channellist.h>
+//#include <channellist.h>
 #include <QVector>
 #include <QString>
 
