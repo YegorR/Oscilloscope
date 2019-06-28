@@ -1,7 +1,6 @@
-#include "channel.h"
+#include "Channel/channel.h"
 
-Channel::Channel(DataStream *data) : iChannel(data){
-    _alive = true;
+Channel::Channel(double x, double y, QString channelName) : iChannel(x, y, channelName){
     _channelType = "Original";
     _invalidTimer = new QTimer();
     _invalidTimer->setInterval(3600);
@@ -10,9 +9,9 @@ Channel::Channel(DataStream *data) : iChannel(data){
 }
 
 void Channel::channelDublicate(){
-    _dublicates.append(new DublicateChannel(this->_data));
+    _dublicates.append(new DublicateChannel(this->x,this->y,this->_channelName));
 }
 
 void Channel::updateStatus(){
-    _alive = !_alive;
+    _alive = false;
 }
