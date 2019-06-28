@@ -9,15 +9,15 @@
 #include "server.h"
 #include "tcpclient.h"
 
-class TCPServer : public Server
+class TcpServer : public Server
 {
 private:
   QTcpServer* _server;
 public:
-  TCPServer(quint16 port, QObject* parent = nullptr);
+  TcpServer(quint16 port, QObject* parent = nullptr);
   bool start();
   void stop();
-  ~TCPServer();
+  ~TcpServer();
 private slots:
   void receiveConnection();
   void receiveData(TcpClient* client);

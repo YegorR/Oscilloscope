@@ -3,34 +3,34 @@
 
 #include "tcpclient.h"
 
-TCPServer::TCPServer(quint16 port, QObject* parent) : Server(port, parent)
+TcpServer::TcpServer(quint16 port, QObject* parent) : Server(port, parent)
 {
   _server = new QTcpServer(this);
   connect(_server, SIGNAL(newConnection()), this, SLOT(receiveConnection()));
 }
 
-TCPServer::~TCPServer()
+TcpServer::~TcpServer()
 {
   stop();
 }
 
-bool TCPServer::start()
+bool TcpServer::start()
 {
   return _server->listen(QHostAddress::LocalHost, port());
 }
 
-void TCPServer::stop()
+void TcpServer::stop()
 {
   _server->close();
 }
 
-void TCPServer::receiveConnection() {
+void TcpServer::receiveConnection() {
   QTcpSocket* socket = _server->nextPendingConnection();
   TcpClient* client = new TcpClient(socket, this);
   connect(client, SIGNAL(readyRead(TcpClient*)), this, SLOT(receiveData(TcpClient*)));
 }
 
-void TCPServer::receiveData(TcpClient* client) {
+void TcpServer::receiveData(TcpClient* client) {
   Frame* newFrame = client->read();
   frame(*newFrame);
 }
