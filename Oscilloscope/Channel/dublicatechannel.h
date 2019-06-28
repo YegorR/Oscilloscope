@@ -2,11 +2,11 @@
 #define DUBLICATECHANNEL_H
 
 #pragma once
-#include <Channel/ichannel.h>
+#include <ichannel.h>
 
 class DublicateChannel : public iChannel {
 public:
-    DublicateChannel(double x, double y, QString channelName);
+    DublicateChannel(DataStream *data);
 };
 
 #endif // DUBLICATECHANNEL_H
