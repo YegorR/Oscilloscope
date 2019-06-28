@@ -6,6 +6,8 @@
 
 #include <ichannel.h>
 
+// xcxz
+
 namespace oscilloscope
 {
     class ChannelList
