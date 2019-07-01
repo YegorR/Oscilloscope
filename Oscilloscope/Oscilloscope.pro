@@ -1,6 +1,6 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network
 
 TARGET = Oscilloscope
 TEMPLATE = app
@@ -25,7 +25,13 @@ SOURCES += \
     globalchannellistview.cpp \
     localchannellistview.cpp \
     channellist.cpp \
-    globalchannellist.cpp
+    globalchannellist.cpp \
+    datastream.cpp \
+    channelcontroller.cpp \
+    frameparser.cpp \
+    server.cpp \
+    tcpclient.cpp \
+    tcpserver.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -34,40 +40,17 @@ HEADERS += \
     globalchannellistview.h \
     localchannellistview.h \
     globalchannellist.h \
-    channellist.h
-    Channel/ChannelList/dublicatechannellist.cpp \
-    Channel\channel.cpp \
-    Channel\ChannelList\channellist.cpp \
-    Channel\dublicatechannel.cpp \
-    Channel\ChannelList\globalchannellistview.cpp \
-    Channel\ichannel.cpp \
-    Channel\ChannelList\localchannellistview.cpp \
-    main.cpp \
-    mainwindow.cpp \
-    datastream.cpp \
-    ChannelController\channelcontroller.cpp \
-    ChannelController\frameparser.cpp \
-    ChannelController\server.cpp \
-    ChannelController\tcpclient.cpp \
-    ChannelController\tcpserver.cpp
+    channellist.h \
+    channelcontroller.h \
+    frame.h \
+    frameparser.h \
+    server.h \
+    tcpclient.h \
+    tcpserver.h
 
 HEADERS += \
-    Channel\ChannelList\ChannelAttributes\attributes.h \
-    Channel\channel.h \
-    Channel\ChannelList\channellist.h \
-    Channel\dublicatechannel.h \
-    Channel\ChannelList\dublicatechannellist.h \
-    Channel\ChannelList\globalchannellist.h \
-    Channel\ChannelList\globalchannellistview.h \
-    Channel\ichannel.h \
-    Channel\ChannelList\localchannellistview.h \
     mainwindow.h \
-    datastream.h \
-    ChannelController\channelcontroller.h \
-    ChannelController\frameparser.h \
-    ChannelController\server.h \
-    ChannelController\tcpclient.h \
-    ChannelController\tcpserver.h
+    datastream.h
 
 FORMS += \
     mainwindow.ui \
