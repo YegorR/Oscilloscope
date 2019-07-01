@@ -1,16 +1,31 @@
+///     ВИДЖЕТ ОТРИСОВКИ СПИСКА ОРИГИНАЛОВ КАНАЛОВ
+
 #ifndef GLOBALCHANNELLISTVIEW_H
 #define GLOBALCHANNELLISTVIEW_H
 
-#pragma once
-#include <QString>
-#include <QVector>
-#include <globalchannellist.h>
+#include <QWidget>
+#include <QListWidget>
 
-class GlobalChannelListView{
-public:
-    void deleteChannel(QString channelName);
-private:
-    QVector<GlobalChannelList> _channels;
-};
+namespace Ui {
+    class globalChannelListView;
+}
 
-#endif // GLOBALCHANNELLISTVIEW_H
+namespace oscilloscope {
+    class globalChannelListView : public QListWidget {
+        Q_OBJECT
+
+    public:
+        explicit globalChannelListView(QWidget *parent = 0);
+
+        ~globalChannelListView();
+
+    protected:
+        void startDrag(Qt::DropActions supportedActions);
+        virtual void keyPressEvent(QKeyEvent *event);
+
+    signals:
+        void channelDeleted(const QString name);
+    };
+}
+
+#endif

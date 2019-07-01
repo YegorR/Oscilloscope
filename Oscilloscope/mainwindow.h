@@ -1,6 +1,14 @@
+///     ГЛАВНОЕ ОКНО, СОЗДАЮЩЕЕ SIMPLESCOP`ы, МЕНЕДЖЕР КАНАЛОВ И СПИСОК ОРИГИНАЛОВ КАНАЛОВ
+
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
 #include <QMainWindow>
 #include <QList>
+#include <QtGui>
+
 #include "simplescope.h"
+#include "globalchannellist.h"
 
 namespace Ui {
     class MainWindow;
@@ -17,14 +25,17 @@ namespace oscilloscope {
 
     private slots:
         void on_createSimpleScope_pressed();
-        void updateScopes();
+        void deleteScope();
+        void channelDelete(const QString name);
 
     private:
         Ui::MainWindow *ui;
+
         QList<simplescope *> _scopes;
+        globalChannelList *_channels;
 
         int countScopes;
     };
 }
 
-
+#endif

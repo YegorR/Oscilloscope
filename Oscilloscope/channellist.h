@@ -1,19 +1,37 @@
+///     РОДИТЕЛЬ СПИСКОВ ОРИГИНАЛОВ И ДУБЛИКАТОВ КАНАЛОВ
+
 #ifndef CHANNELLIST_H
 #define CHANNELLIST_H
 
-#pragma once
-//#include <ichannel.h>
+#define CH_ALIVE Qt::black
+#define CH_DEAD Qt::gray
+
 #include <QList>
-#include <QString>
+#include <QObject>
 
-class iChannel;
-class ChannelList{
-private:
-    QList<iChannel*> _channels;
-public:
-    void add(iChannel ch);
-    QList<iChannel*> channels();
-    iChannel* channelByName(QString channelName);
-};
+namespace oscilloscope {
+    class channelList : public QObject {
+        Q_OBJECT
 
-#endif // CHANNELLIST_H
+    protected:
+        channelList();
+
+        ~channelList();
+
+        QList<QString> *_channels;
+
+    public:
+        QList<QString> *channels() const;
+
+        void add(QString channel);
+
+    public slots:
+        void channelDelete(const QString name);
+
+    signals:
+        void channelDeleted(const QString name);
+
+    };
+}
+
+#endif
