@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2019-06-26T11:47:07
-#
-#-------------------------------------------------
-
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
@@ -24,8 +18,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
+    main.cpp \
+    mainwindow.cpp \
     qcustomplot.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
@@ -34,16 +28,49 @@ SOURCES += \
     globalchannellist.cpp
 
 HEADERS += \
-        mainwindow.h \
+    mainwindow.h \
     qcustomplot.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
     globalchannellist.h \
     channellist.h
+    Channel/ChannelList/dublicatechannellist.cpp \
+    Channel\channel.cpp \
+    Channel\ChannelList\channellist.cpp \
+    Channel\dublicatechannel.cpp \
+    Channel\ChannelList\globalchannellistview.cpp \
+    Channel\ichannel.cpp \
+    Channel\ChannelList\localchannellistview.cpp \
+    main.cpp \
+    mainwindow.cpp \
+    datastream.cpp \
+    ChannelController\channelcontroller.cpp \
+    ChannelController\frameparser.cpp \
+    ChannelController\server.cpp \
+    ChannelController\tcpclient.cpp \
+    ChannelController\tcpserver.cpp
+
+HEADERS += \
+    Channel\ChannelList\ChannelAttributes\attributes.h \
+    Channel\channel.h \
+    Channel\ChannelList\channellist.h \
+    Channel\dublicatechannel.h \
+    Channel\ChannelList\dublicatechannellist.h \
+    Channel\ChannelList\globalchannellist.h \
+    Channel\ChannelList\globalchannellistview.h \
+    Channel\ichannel.h \
+    Channel\ChannelList\localchannellistview.h \
+    mainwindow.h \
+    datastream.h \
+    ChannelController\channelcontroller.h \
+    ChannelController\frameparser.h \
+    ChannelController\server.h \
+    ChannelController\tcpclient.h \
+    ChannelController\tcpserver.h
 
 FORMS += \
-        mainwindow.ui \
+    mainwindow.ui \
     simplescope.ui
 
 RESOURCES += \
