@@ -9,8 +9,10 @@
 
 #include "localchannellistview.h"
 
-namespace oscilloscope {
-    localChannelListView::localChannelListView(QWidget* parent, channelList *globalList) : QListWidget(parent) {
+namespace oscilloscope
+{
+    localChannelListView::localChannelListView(QWidget* parent) : QListWidget(parent)
+    {
         setFixedWidth(150);
 
         setSelectionMode(QAbstractItemView::SingleSelection);
@@ -18,18 +20,43 @@ namespace oscilloscope {
         setAcceptDrops(true);
 
         setStyleSheet("color: Black");
+    }
 
-        _globalList = globalList;
+    localChannelListView::~localChannelListView()
+    {
+        _attributesList.clear();
+    }
+
+    void localChannelListView::setAttributes(const int index, attributes &atr)
+    {
+        _attributesList[index] = &atr;
+    }
+
+    attributes* localChannelListView::getAttributes(const int index) const
+    {
+        return _attributesList[index];
+    }
+
+    void localChannelListView::deleteChannel(const int index)
+    {
+        delete this->takeItem(index);
+        _names.removeAt(index);
+
     }
 
     /// DnD
-
-    void localChannelListView::dragMoveEvent(QDragMoveEvent* event) {
-        if (event->mimeData()->hasFormat("application/x-item") && event->source() != this) event->accept();
-            else event->ignore();
+    void localChannelListView::dragMoveEvent(QDragMoveEvent* event)
+    {
+        if (event->mimeData()->hasFormat("application/x-item") && event->source() != this){
+            event->accept();
+        }
+        else {
+            event->ignore();
+        }
     }
 
-    void localChannelListView::dropEvent(QDropEvent* event) {
+    void localChannelListView::dropEvent(QDropEvent* event)
+    {
         if (event->mimeData()->hasFormat("application/x-item")) {
             event->accept();
 
@@ -59,24 +86,23 @@ namespace oscilloscope {
                 QListWidgetItem *item = new QListWidgetItem(this);
 
                 setItemWidget(item, channel);
+                attributes *atr;
+                _attributesList.push_back(atr);
             }
-        } else event->ignore();
+        } else {
+            event->ignore();
+        }
     }
 
-    void localChannelListView::dragEnterEvent(QDragEnterEvent* event) {
-        if (event->mimeData()->hasFormat("application/x-item")) event->accept();
-            else event->ignore();
+    void localChannelListView::dragEnterEvent(QDragEnterEvent* event)
+    {
+        if (event->mimeData()->hasFormat("application/x-item")) {
+            event->accept();
+        } else {
+            event->ignore();
+        };
     }
 
-    /// Удаление канала
 
-    void localChannelListView::deleteChannel(const QString name) {
-        int index = _names.indexOf(name);
 
-        delete this->takeItem(index);
-        _names.removeAt(index);
-
-    }
-
-    localChannelListView::~localChannelListView() {}
 }

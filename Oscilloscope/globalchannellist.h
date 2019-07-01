@@ -9,16 +9,17 @@
 #include "channellist.h"
 #include "globalchannellistview.h"
 
-namespace oscilloscope {
-    class globalChannelList : public channelList {
+namespace oscilloscope
+{
+    class globalChannelList : public channelList
+    {
         Q_OBJECT
 
     public:
-        globalChannelList(QLayout *parent = 0);
+        globalChannelList();
+        ~globalChannelList();
 
         void add(QString channel, bool alive = true);
-
-        ~globalChannelList();
 
     private:
         globalChannelListView *_channelsView;

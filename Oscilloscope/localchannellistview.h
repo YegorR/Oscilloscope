@@ -8,6 +8,7 @@
 #include <QList>
 
 #include "channellist.h"
+#include "attributes.h"
 
 namespace Ui {
     class localChannelListView;
@@ -18,13 +19,12 @@ namespace oscilloscope {
         Q_OBJECT
 
     public:
-        QList<QString> _names;
-
-        explicit localChannelListView(QWidget *parent = 0, channelList *globalList = 0);
-
-        void deleteChannel(const QString name);
-
+        explicit localChannelListView(QWidget *parent = nullptr);
         ~localChannelListView();
+
+        void setAttributes(const int index, attributes &atr);
+        attributes* getAttributes(const int index) const;
+        void deleteChannel(const int index);
 
     protected:
         void dragMoveEvent(QDragMoveEvent* event);
@@ -32,7 +32,8 @@ namespace oscilloscope {
         void dragEnterEvent(QDragEnterEvent* event);
 
     private:
-        channelList *_globalList;
+        QList<attributes*> _attributesList;
+        QList<QString> _names;
 
     };
 }

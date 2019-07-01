@@ -18,6 +18,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
+    attributes.cpp \
     main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
@@ -31,7 +32,10 @@ SOURCES += \
     frameparser.cpp \
     server.cpp \
     tcpclient.cpp \
-    tcpserver.cpp
+    tcpserver.cpp \
+	channel.cpp \
+	dublicatechannel.cpp \
+	ichannel.cpp 
 
 HEADERS += \
     mainwindow.h \
@@ -46,7 +50,11 @@ HEADERS += \
     frameparser.h \
     server.h \
     tcpclient.h \
-    tcpserver.h
+    tcpserver.h \
+	channel.h \
+	dublicatechannel.h \
+	ichannel.h \
+	attributes.h
 
 HEADERS += \
     mainwindow.h \
