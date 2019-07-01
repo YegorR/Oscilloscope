@@ -27,13 +27,24 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     qcustomplot.cpp \
-    simplescope.cpp
+    simplescope.cpp \
+    globalchannellistview.cpp \
+    localchannellistview.cpp \
+    channellist.cpp \
+    globalchannellist.cpp
 
 HEADERS += \
         mainwindow.h \
     qcustomplot.h \
-    simplescope.h
+    simplescope.h \
+    globalchannellistview.h \
+    localchannellistview.h \
+    globalchannellist.h \
+    channellist.h
 
 FORMS += \
         mainwindow.ui \
     simplescope.ui
+
+RESOURCES += \
+    icons.qrc

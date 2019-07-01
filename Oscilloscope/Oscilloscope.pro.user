@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.6.1, 2019-06-26T14:20:17. -->
+<!-- Written by QtCreator 4.6.1, 2019-07-01T11:21:54. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -303,8 +303,8 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Oscilloscope</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Oscilloscope2</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/westohka/Yheba/Practica/Oscilloscope/Oscilloscope/Oscilloscope.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/Users/westohka/Yheba/Practica/_Oscilloscope/Oscilloscope.pro</value>
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">Oscilloscope.pro</value>
