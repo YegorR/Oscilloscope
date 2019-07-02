@@ -2,8 +2,8 @@
 #define ICHANNEL_H
 
 #pragma once
-#include <channellist.h>
-#include <datastream.h>
+#include "channellist.h"
+#include "datastream.h"
 #include <QVector>
 #include <QString>
 #include <QObject>
@@ -17,10 +17,9 @@ public:
     QString channelType();
     QString channelName();
 private:
-    QVector <QVector<double>> _points;
+    QVector <double> _points;
     QString _nickname;
-    template<typename T>
-    QVector <QVector<double>> transformType(QVector <QVector<T>> *points);
+    QVector <double> transformType(QVector <QVariant> points, int transNum);
 protected:
     QString _channelType; //В конструкторах channel и dublicateChannel будут определяться разные значения для _channelType
     DataStream *_data;

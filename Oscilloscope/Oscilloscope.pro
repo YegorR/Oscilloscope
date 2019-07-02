@@ -19,6 +19,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     attributes.cpp \
+    fft.cpp \
     main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
@@ -38,6 +39,7 @@ SOURCES += \
 	ichannel.cpp 
 
 HEADERS += \
+    fft.h \
     mainwindow.h \
     qcustomplot.h \
     simplescope.h \
