@@ -13,6 +13,7 @@ QVector<double> FFT::goFFT(QVector<QVariant> data){
         for (int j = 0; j < S; j++){
             buffer[i] += doubleData[j] * std::complex<double>(cos(2 * M_PI * i * j / S), sin(2 * M_PI * i * j / S));
         }
+        out[i] = sqrt(pow(buffer[i].real(),2)+pow(buffer[i].imag(),2));
     }
     return out;
 }
