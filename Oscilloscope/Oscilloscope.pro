@@ -23,6 +23,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp \
+    signalsmoothing.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
     fft.h \
     mainwindow.h \
     qcustomplot.h \
+    signalsmoothing.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \

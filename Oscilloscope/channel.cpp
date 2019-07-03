@@ -14,5 +14,5 @@ void Channel::channelDublicate(){
 }
 
 void Channel::updateStatus(){
-    _alive = !_alive;
+    _alive = false;
 }
