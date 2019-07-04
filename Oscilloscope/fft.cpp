@@ -8,7 +8,7 @@ QVector<double> FFT::goFFT(QVector<QVariant> data){
     }
     QVector<std::complex<double>> buffer(S,0);
     QVector<double> out(S,0);
-    for (int i = 0; i < S; i++){
+    for (int i = 0; i < S/2; i++){
         buffer[i] = std::complex<double>(0.0, 0.0);
         for (int j = 0; j < S; j++){
             buffer[i] += doubleData[j] * std::complex<double>(cos(2 * M_PI * i * j / S), sin(2 * M_PI * i * j / S));
