@@ -9,18 +9,25 @@
 #include "server.h"
 #include "tcpclient.h"
 
-class TcpServer : public Server
-{
-private:
-  QTcpServer* _server;
-public:
-  TcpServer(quint16 port, QObject* parent = nullptr);
-  bool start();
-  void stop();
-  ~TcpServer();
-private slots:
-  void receiveConnection();
-  void receiveData(TcpClient* client);
-};
+namespace oscilloscope {
+    class TcpServer : public Server {
+        Q_OBJECT
+
+    private:
+        QTcpServer* _server;
+
+    public:
+        TcpServer(quint16 port, QObject *parent = nullptr);
+
+        bool start();
+        void stop();
+
+        ~TcpServer();
+
+    private slots:
+        void receiveConnection();
+        void receiveData(TcpClient *client);
+    };
+}
 
 #endif // TCPSERVER_H

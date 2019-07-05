@@ -1,12 +1,25 @@
+///     ДУБЛИКАТ КАНАЛА
+
 #ifndef DUBLICATECHANNEL_H
 #define DUBLICATECHANNEL_H
 
-#pragma once
-#include <ichannel.h>
+#define DUBLICATE_NAME(index, name) "D " + QString::number(index) + " (" + name + ")"
+#define DUBLICATE_NAME_BY_PARENT(name) "(" + name + ")"
 
-class DublicateChannel : public iChannel {
-public:
-    DublicateChannel(DataStream *data);
-};
+#include "ichannel.h"
+#include "channel.h"
 
-#endif // DUBLICATECHANNEL_H
+namespace oscilloscope {
+    class DublicateChannel : public iChannel {
+    public:
+        explicit DublicateChannel(const Channel *channel);
+
+        QString name() const;
+        QString setName(QString name);
+
+    private:
+        QString _name;
+    };
+}
+
+#endif

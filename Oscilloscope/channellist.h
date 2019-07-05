@@ -11,29 +11,28 @@
 
 #include "ichannel.h"
 
-namespace oscilloscope
-{
-    class channelList : public QObject
-    {
+namespace oscilloscope {
+    class iChannelList : public QObject {
         Q_OBJECT
 
-    protected:
-        channelList(iChannel* ch);
-        ~channelList();
+    protected:       
+       QList<iChannel *> *_channels;
 
-        void add(iChannel* ch);
-        iChannel* getChannel(const QString channelName) const;
-        int indexChannelByName(const QString channelName) const;
-        QList<iChannel*> getChannels() const;
+       explicit iChannelList();
 
-        QList<iChannel*> _channels;
+    public:        
+        QList<iChannel *> *channels() const;
 
+        void add(iChannel *channel);
+        virtual int indexByName(const QString name) const = 0;
 
-    public slots:
-        // void channelDelete(const QString name);
+        ~iChannelList();
+
+    protected slots:
+        void channelDelete(const QString name);
 
     signals:
-        // void channelDeleted(const QString name);
+        void channelDeleted(const QString name);
 
     };
 }

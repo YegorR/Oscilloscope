@@ -1,28 +1,42 @@
+///     РОДИТЕЛЬ КАНАЛОВ (ДУБЛИКАТОВ И ОРИГИНАЛОВ)
+
 #ifndef ICHANNEL_H
 #define ICHANNEL_H
 
-#pragma once
-#include "channellist.h"
-#include "datastream.h"
+#define CH_ORIGINAL 0
+#define CH_DUBLICATE 1
+
 #include <QVector>
 #include <QString>
 #include <QObject>
 
-class iChannel : public QObject{
-    Q_OBJECT
-public:
-    iChannel(DataStream *data);
-    ~iChannel();
-    QString nickname();
-    QString channelType();
-    QString channelName();
-private:
-    QVector <double> _points;
-    QString _nickname;
-    QVector <double> transformType(QVector <QVariant> points, int transNum);
-protected:
-    QString _channelType; //В конструкторах channel и dublicateChannel будут определяться разные значения для _channelType
-    DataStream *_data;
-};
+#include <datastream.h>
 
-#endif // ICHANNEL_H
+namespace oscilloscope {
+    class iChannel : public QObject {
+        Q_OBJECT
+    public:
+        int channelType() const;
+        DataStream *data() const;
+
+        ~iChannel();
+
+    private:
+        QVector <QVector<double>> _points;
+
+        QVector <QVector<double>> (*_transformFunc)(const DataStream *data);
+
+        void transform();
+
+    protected:
+        explicit iChannel(DataStream *data);
+        iChannel(const iChannel *channel);
+
+        int _channelType;
+        DataStream *_data;
+    };
+
+    QVector <QVector<double>> bpf(const DataStream *data);
+}
+
+#endif

@@ -6,8 +6,9 @@
 #include <QWidget>
 #include <QListWidget>
 #include <QList>
+#include <QCheckBox>
 
-#include "channellist.h"
+#include "ilistview.h"
 #include "attributes.h"
 
 namespace Ui {
@@ -15,26 +16,37 @@ namespace Ui {
 }
 
 namespace oscilloscope {
-    class localChannelListView : public QListWidget {
+    class LocalChannelListView : public iListView {
         Q_OBJECT
 
     public:
-        explicit localChannelListView(QWidget *parent = nullptr);
-        ~localChannelListView();
+        explicit LocalChannelListView(QWidget *parent = 0);
 
-        void setAttributes(const int index, attributes &atr);
-        attributes* getAttributes(const int index) const;
-        void deleteChannel(const int index);
+        Attributes *attribute(int index) const;
+        QListWidgetItem *itemByName(QString name) const;
+        QListWidgetItem *itemDublicateByName(QString name) const;
+
+        void addChannel(QString name);
+        void deleteChannel(const QString name);
+        void deleteDublicates(const QString name);
+
+        ~LocalChannelListView();
 
     protected:
         void dragMoveEvent(QDragMoveEvent* event);
         void dropEvent(QDropEvent* event);
         void dragEnterEvent(QDragEnterEvent* event);
 
-    private:
-        QList<attributes*> _attributesList;
-        QList<QString> _names;
+        void itemDelete(QListWidgetItem *item);
 
+    private:
+        QList<Attributes *> _attributes;
+
+    private slots:
+        void itemCheck();
+
+    signals:
+        void itemChecked();
     };
 }
 

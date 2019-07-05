@@ -6,25 +6,25 @@
 #include <QWidget>
 #include <QListWidget>
 
+#include "ilistview.h"
+
 namespace Ui {
     class globalChannelListView;
 }
 
 namespace oscilloscope {
-    class globalChannelListView : public QListWidget {
+    class GlobalChannelListView : public iListView {
         Q_OBJECT
 
     public:
-        explicit globalChannelListView(QWidget *parent = 0);
+        explicit GlobalChannelListView(QWidget *parent = 0);
 
-        ~globalChannelListView();
+        ~GlobalChannelListView();
 
     protected:
         void startDrag(Qt::DropActions supportedActions);
-        virtual void keyPressEvent(QKeyEvent *event);
 
-    signals:
-        void channelDeleted(const QString name);
+        void itemDelete(QListWidgetItem *item);
     };
 }
 

@@ -1,29 +1,19 @@
+///     АТРИБУТЫ ЛОКАЛЬНОГО КАНАЛА ДЛЯ ОТРИСОВКА НА ДИСПЛЕЕ
+
 #ifndef ATTRIBUTES_H
 #define ATTRIBUTES_H
 
 #include <QColor>
 
-namespace oscilloscope
-{
-    class attributes
-    {
-    public:
-        attributes();
-        ~attributes();
-
-        QColor getColor();
-        int getLineType();
-        int intgetLineWidht();
-        void setColor(QColor color);
-        void setLineType(int type);
-        void setLineWydht(int widht);
-
-    private:
+namespace oscilloscope {
+    struct Attributes {
         QColor _color;
+
         int _lineType;
         int _lineWidth;
+
+        Attributes(QColor color = Qt::black, int lineType = 0, int lineWidth = 0);
     };
 }
 
-#endif // ATTRIBUTES_H
-
+#endif

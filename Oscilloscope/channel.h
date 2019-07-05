@@ -1,22 +1,35 @@
+///     ОРИГИНАЛЬНЫЙ КАНАЛ
+
 #ifndef CHANNEL_H
 #define CHANNEL_H
 
-#pragma once
-#include <dublicatechannel.h>
-#include <ichannel.h>
 #include <QTimer>
-#include <QList>
+#include <QObject>
 
-class Channel : public iChannel{
-private:
-    QTimer *_invalidTimer;
-    QList<DublicateChannel*> _dublicates;
-    bool _alive;
+#include "ichannel.h"
 
-public:   
-    Channel(DataStream *data);
-    void channelDublicate();
-    void updateStatus(); //функция используется как слот для изменения состояния _alive при сигнале таймера
-};
+namespace oscilloscope {
+    class Channel : public iChannel {
+        Q_OBJECT
 
-#endif // CHANNEL_H
+    private:
+        QTimer *_invalidTimer;
+        bool _alive;
+
+    public:
+        Channel(DataStream *data);
+
+        bool status() const;
+
+        ~Channel();
+
+    public slots:
+        void channelDisconnected();
+        void channelConnected();
+
+    signals:
+        void channelUpdated(Channel *);
+    };
+}
+
+#endif
