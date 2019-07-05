@@ -86,11 +86,11 @@ namespace oscilloscope {
                 if (pointSize == 1) {
                     readComplexPoint<qint8>(stream, N, frame->_points);
                 } else if (pointSize == 2) {
-                    readComplexPoint<quint16>(stream, N, frame->_points);
+                    readComplexPoint<qint16>(stream, N, frame->_points);
                 } else if (pointSize == 4) {
-                    readComplexPoint<quint32>(stream, N, frame->_points);
+                    readComplexPoint<qint32>(stream, N, frame->_points);
                 } else if (pointSize == 8) {
-                    readComplexPoint<quint64>(stream, N, frame->_points);
+                    readComplexPoint<qint64>(stream, N, frame->_points);
                 }
             }
         } else {
@@ -104,11 +104,11 @@ namespace oscilloscope {
                 if (pointSize == 1) {
                     readSimplePoint<qint8>(stream, N, frame->_points);
                 } else if (pointSize == 2) {
-                    readSimplePoint<quint16>(stream, N, frame->_points);
+                    readSimplePoint<qint16>(stream, N, frame->_points);
                 } else if (pointSize == 4) {
-                    readSimplePoint<quint32>(stream, N, frame->_points);
+                    readSimplePoint<qint32>(stream, N, frame->_points);
                 } else if (pointSize == 8) {
-                    readSimplePoint<quint64>(stream, N, frame->_points);
+                    readSimplePoint<qint64>(stream, N, frame->_points);
                 }
             }
 
