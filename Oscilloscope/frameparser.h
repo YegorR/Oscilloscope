@@ -3,11 +3,12 @@
 
 #include "frame.h"
 
-class FrameParser
-{
-public:
-  FrameParser();
-  Frame* parse(QByteArray& data);
-};
+namespace oscilloscope {
+    class FrameParser {
+    public:
+        FrameParser();
+        Frame *parse(QByteArray &data);
+    };
+}
 
 #endif // FRAMEPARSER_H

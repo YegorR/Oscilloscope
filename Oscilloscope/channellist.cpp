@@ -1,44 +1,43 @@
 #include "channellist.h"
 
-namespace oscilloscope
-{
-    channelList::channelList(iChannel* ch)
-    {
-        _channels.push_back(ch);
+namespace oscilloscope {
+    /// Конструктор - создание списка каналов
+
+    iChannelList::iChannelList() {
+        _channels = new QList<iChannel *>;
     }
 
-    channelList::~channelList()
-    {
-        _channels.clear();
-    }
+    /// Получения списка каналов
 
-    void channelList::add(iChannel *ch)
-    {
-        _channels.push_back(ch);
-    }
-
-    iChannel* channelList::getChannel(const QString channelName) const
-    {
-        return _channels[indexChannelByName(channelName)];
-    }
-
-    int channelList::indexChannelByName(const QString channelName) const
-    {
-        for (int  i = 0; i < _channels.size(); i++) {
-            if (_channels[i]->channelName() == channelName) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    QList<iChannel*> channelList::getChannels() const
-    {
+    QList<iChannel *> *iChannelList::channels() const {
         return _channels;
     }
 
-    void channelList::channelDelete(const QString name) {
-        _channels->removeAt(_channels->indexOf(name));
+    /// Добавление канала в список
+
+    void iChannelList::add(iChannel * channel) {
+        _channels->push_back(channel);
+    }
+
+    /// Удаление канала
+
+    void iChannelList::channelDelete(const QString name) {
         emit channelDeleted(name);
+
+        int index = indexByName(name);
+
+        if (index >= 0) {
+            delete _channels->at(index);
+            _channels->removeAt(index);
+        }
+    }
+
+    /// Деструктор
+
+    iChannelList::~iChannelList() {
+        for (int i = 0; i < _channels->length(); i++)
+            delete _channels->at(i);
+
+        delete _channels;
     }
 }

@@ -5,104 +5,128 @@
 #include <QCheckBox>
 #include <QListWidgetItem>
 
-#include <QDebug>
-
 #include "localchannellistview.h"
 
-namespace oscilloscope
-{
-    localChannelListView::localChannelListView(QWidget* parent) : QListWidget(parent)
-    {
+namespace oscilloscope {
+    /// СОЗДАНИЕ ЛОКАЛЬНОГО СПИСКА ОТОБРАЖЕНИЯ КАНАЛОВ И ИХ ДУБЛИКАТОВ
+
+    LocalChannelListView::LocalChannelListView(QWidget* parent) : iListView(parent) {
         setFixedWidth(150);
-
-        setSelectionMode(QAbstractItemView::SingleSelection);
-        setDropIndicatorShown(true);
         setAcceptDrops(true);
-
-        setStyleSheet("color: Black");
     }
 
-    localChannelListView::~localChannelListView()
-    {
-        _attributesList.clear();
+    /// ОТСЛЕЖИВАНИЯ ПЕРЕМЕЩЕНИЯ ЗАХВАЧЕННОГО ОБЪЕКТА
+
+    void LocalChannelListView::dragMoveEvent(QDragMoveEvent* event) {
+        if (event->mimeData()->hasFormat("application/x-item") && event->source() != this) {
+            QString name = event->mimeData()->data("application/x-item");
+
+            if (!itemByName(name)) event->accept();
+                else event->ignore();
+        } else event->ignore();
     }
 
-    void localChannelListView::setAttributes(const int index, attributes &atr)
-    {
-        _attributesList[index] = &atr;
-    }
+    /// ПРИНЯТИЕ ЗАХВАЧЕННОГО ОБЪЕКТА
 
-    attributes* localChannelListView::getAttributes(const int index) const
-    {
-        return _attributesList[index];
-    }
-
-    void localChannelListView::deleteChannel(const int index)
-    {
-        delete this->takeItem(index);
-        _names.removeAt(index);
-
-    }
-
-    /// DnD
-    void localChannelListView::dragMoveEvent(QDragMoveEvent* event)
-    {
-        if (event->mimeData()->hasFormat("application/x-item") && event->source() != this){
-            event->accept();
-        }
-        else {
-            event->ignore();
-        }
-    }
-
-    void localChannelListView::dropEvent(QDropEvent* event)
-    {
+    void LocalChannelListView::dropEvent(QDropEvent* event) {
         if (event->mimeData()->hasFormat("application/x-item")) {
             event->accept();
 
             QString name = event->mimeData()->data("application/x-item");
 
-            /*QWidget *widget;
-            QLayout *layout;
-            QLayoutItem *item;
-            QLabel *label;
+            addChannel(name);
+        } else event->ignore();
+    }
 
-            for (int i = 0; i < count(); i++) {
-                widget = this->itemWidget(this->item(i));
-                layout = itm->layout();
-                item = _layout->itemAt(1);
-                label = dynamic_cast<QLabel *>(_item->widget());
+    /// ОТСЛЕЖИВАНИЯ СТОЛКНОВЕНИЯ С ЗАХВАЧЕННЫМ ОБЪЕКТОМ
 
-                if (label->text() == name) {
-                    exists = true;
-                    break;
-                }
-            }*/
+    void LocalChannelListView::dragEnterEvent(QDragEnterEvent* event) {
+        if (event->mimeData()->hasFormat("application/x-item")) event->accept();
+            else event->ignore();
+    }
 
-            if (_names.indexOf(name) < 0) {
-                _names.append(name);
+    /// ПОЛУЧЕНИЕ ОРИГИНАЛА ПО ЕГО ИМЕНИ
 
-                QCheckBox *channel = new QCheckBox(name);
-                QListWidgetItem *item = new QListWidgetItem(this);
+    QListWidgetItem *LocalChannelListView::itemByName(QString name) const {
+        QCheckBox *item;
 
-                setItemWidget(item, channel);
-                attributes *atr;
-                _attributesList.push_back(atr);
-            }
-        } else {
-            event->ignore();
+        for (int i = 0; i < this->count(); i++) {
+            item = dynamic_cast<QCheckBox *>(this->itemWidget(this->item(i)));
+
+            if (item->text() == name)
+                return this->item(i);
         }
+
+        return 0;
     }
 
-    void localChannelListView::dragEnterEvent(QDragEnterEvent* event)
-    {
-        if (event->mimeData()->hasFormat("application/x-item")) {
-            event->accept();
-        } else {
-            event->ignore();
-        };
+    /// ПОЛУЧЕНИЕ ДУБЛИКАТА ПО ЕГО ИМЕНИ
+
+    QListWidgetItem *LocalChannelListView::itemDublicateByName(QString name) const {
+        QCheckBox *item;
+
+        for (int i = 0; i < this->count(); i++) {
+            item = dynamic_cast<QCheckBox *>(this->itemWidget(this->item(i)));
+            if (item->text().contains(name, Qt::CaseInsensitive)) return this->item(i);
+        }
+
+        return 0;
     }
 
+    /// ДОБАВЛЕНИЯ КАНАЛА В СПИСОК ОТОБРАЖЕНИЯ
 
+    void LocalChannelListView::addChannel(QString name) {;
+        QCheckBox *channel = new QCheckBox(name);
+        connect(channel, SIGNAL(stateChanged(int)), this, SLOT(itemCheck()));
 
+        QListWidgetItem *item = new QListWidgetItem(this);
+
+        setItemWidget(item, channel);
+
+        Attributes *atr = new Attributes();
+        _attributes.append(atr);
+    }
+
+    /// ОБРАБОТКА СИГНАЛА О ИЗМЕНЕНИИ СОСТОЯНИЯ CHECKBOX`а
+
+    void LocalChannelListView::itemCheck() {
+        emit itemChecked();
+    }
+
+    /// УДАЛЕНИЕ ОБЪЕКТА ИЗ СПИСКА ОТОБРАЖЕНИЯ
+
+    void LocalChannelListView::itemDelete(QListWidgetItem *item) {
+        emit channelDeleted(item->text());
+        delete this->takeItem(this->row(item));
+    }
+
+    /// УДАЛЕНИЕ ОРИГИНАЛА ПО ЕГО НАЗВАНИЮ
+
+    void LocalChannelListView::deleteChannel(const QString name) {
+        QListWidgetItem *item = this->itemByName(name);
+
+        if (item) delete item;
+    }
+
+    /// УДАЛЕНИЕ ВСЕХ ДУБЛИКАТОВ ПО НАЗВАНИЮ ОРИГИНАЛА
+
+    void LocalChannelListView::deleteDublicates(const QString name) {
+        QListWidgetItem *item;
+
+        while ((item = this->itemDublicateByName(name)))
+            delete item;
+    }
+
+    /// ПОЛУЧЕНИЕ АТРИБУТОВ ОТОБРАЖЕНИЯ КОНКРЕТНОГО КАНАЛА
+
+    Attributes *LocalChannelListView::attribute(int index) const {
+        return _attributes.at(index);
+    }
+
+    /// ДЕСТРУКТОР
+
+    LocalChannelListView::~LocalChannelListView() {
+        for (int i = 0; i < _attributes.length(); i++)
+            delete _attributes.at(i);
+    }
 }

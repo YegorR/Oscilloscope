@@ -2,19 +2,19 @@
 #include <QMimeData>
 #include <QDrag>
 
-#include "globalchannellistview.h"
 #include "channellist.h"
+#include "globalchannellistview.h"
 
 namespace oscilloscope {
-    globalChannelListView::globalChannelListView(QWidget* parent) : QListWidget(parent) {
-        this->setSelectionMode(QAbstractItemView::SingleSelection);
+    /// КОНСТРУТОР - СОЗДАНИЕ СПИСКА ОТОБРАЖЕНИЯ ОРИГИНАЛЬНЫХ КАНАЛОВ
+
+    GlobalChannelListView::GlobalChannelListView(QWidget* parent) : iListView(parent) {
         this->setDragEnabled(true);
-        this->setDropIndicatorShown(true);
     }
 
-    /// DnD
+    /// ЗАХВАТ ОБЪЕКТА
 
-    void globalChannelListView::startDrag(Qt::DropActions) {
+    void GlobalChannelListView::startDrag(Qt::DropActions) {
         QListWidgetItem *item = currentItem();
         QMimeData *mimeData = new QMimeData;
 
@@ -28,18 +28,16 @@ namespace oscilloscope {
         drag->exec(Qt::CopyAction);
     }
 
-    /// Обработка нажатий клаввиш
+    /// УДАЛЕНИЕ ОТКЛЮЧИВШЕГОСЯ КАНАЛА
 
-    void globalChannelListView::keyPressEvent(QKeyEvent *event) {
-        if (event->key() == Qt::Key_Backspace) {
-            if (this->currentRow() >= 0) {
-                if (this->item(currentRow())->foreground() == CH_DEAD) {
-                    emit channelDeleted(this->item(currentRow())->text());
-                    delete this->takeItem(currentRow());
-                }
-            }
+    void GlobalChannelListView::itemDelete(QListWidgetItem *item) {
+        if (item->foreground() == CH_DEAD) {
+            emit channelDeleted(item->text());
+            delete this->takeItem(this->row(item));
         }
     }
 
-    globalChannelListView::~globalChannelListView() {}
+    /// ДЕСТРУКТОР
+
+    GlobalChannelListView::~GlobalChannelListView() {}
 }

@@ -1,27 +1,32 @@
+///     ПОТОК СТРУКТУРИРОВАННЫХ ДАННЫХ
+
 #ifndef DATASTREAM_H
 #define DATASTREAM_H
 
 #include <QMutex>
-#include "ChannelController/frame.h"
 #include <QObject>
 
-class DataStream : QObject {
-    Q_OBJECT
+#include "frame.h"
 
-    private:
-        QString const _channelName;
-        Frame* _frame = nullptr;
-        QMutex _mutex;
+namespace oscilloscope {
+    class DataStream : QObject {
+        Q_OBJECT
 
-    public:
-        DataStream(QString);
-        QString channelName() const;
-        Frame* frame();
+        private:
+            Frame *_frame;
+            QMutex _mutex;
 
-        void update(Frame*);
+        public:
+            DataStream(Frame *frame);
 
-    signals:
-        void update();
-};
+            Frame *frame() const;
+            void update(Frame *);
 
-#endif // DATASTREAM_H
+            ~DataStream();
+
+        signals:
+            void update();
+    };
+}
+
+#endif

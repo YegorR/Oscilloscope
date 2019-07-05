@@ -1,3 +1,9 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2019-06-26T11:47:07
+#
+#-------------------------------------------------
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network
@@ -18,54 +24,51 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    attributes.cpp \
-    fft.cpp \
-    main.cpp \
-    mainwindow.cpp \
+        main.cpp \
+        mainwindow.cpp \
     qcustomplot.cpp \
-    signalsmoothing.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
     channellist.cpp \
     globalchannellist.cpp \
+    ilistview.cpp \
+    localchannellist.cpp \
+    attributes.cpp \
+    ichannel.cpp \
     datastream.cpp \
+    channel.cpp \
+    dublicatechannel.cpp \
     channelcontroller.cpp \
-    frameparser.cpp \
     server.cpp \
-    tcpclient.cpp \
     tcpserver.cpp \
-	channel.cpp \
-	dublicatechannel.cpp \
-	ichannel.cpp 
+    tcpclient.cpp \
+    frameparser.cpp
 
 HEADERS += \
-    fft.h \
-    mainwindow.h \
+        mainwindow.h \
     qcustomplot.h \
-    signalsmoothing.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
     globalchannellist.h \
     channellist.h \
-    channelcontroller.h \
+    ilistview.h \
+    localchannellist.h \
+    attributes.h \
+    ichannel.h \
+    datastream.h \
     frame.h \
-    frameparser.h \
+    channel.h \
+    dublicatechannel.h \
+    channelcontroller.h \
     server.h \
-    tcpclient.h \
     tcpserver.h \
-	channel.h \
-	dublicatechannel.h \
-	ichannel.h \
-	attributes.h
-
-HEADERS += \
-    mainwindow.h \
-    datastream.h
+    tcpclient.h \
+    frameparser.h
 
 FORMS += \
-    mainwindow.ui \
+        mainwindow.ui \
     simplescope.ui
 
 RESOURCES += \
