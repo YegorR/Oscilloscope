@@ -45,15 +45,11 @@ SOURCES += \
     tcpclient.cpp \
     frameparser.cpp
 
-HEADERS += \
-<<<<<<< HEAD \
+HEADERS +=
     signalsmoothing.h
     fft.h \
     fftw3.h \
     mainwindow.h \
-=======
-        mainwindow.h \
->>>>>>> fc6bd2929f4189609acfb670315bde6954a062f4
     qcustomplot.h \
     simplescope.h \
     globalchannellistview.h \
