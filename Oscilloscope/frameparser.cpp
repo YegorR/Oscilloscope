@@ -22,6 +22,7 @@ namespace oscilloscope {
         Frame *frame = new Frame();
 
         QDataStream stream(&data, QIODevice::ReadOnly);
+        stream.setByteOrder(QDataStream::LittleEndian);
 
         quint32 size;
         stream >> size;
