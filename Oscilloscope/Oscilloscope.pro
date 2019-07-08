@@ -45,8 +45,8 @@ SOURCES += \
     tcpclient.cpp \
     frameparser.cpp
 
-HEADERS +=
-    signalsmoothing.h
+HEADERS += \
+    signalsmoothing.h \
     fft.h \
     fftw3.h \
     mainwindow.h \
@@ -76,8 +76,3 @@ FORMS += \
 
 RESOURCES += \
     icons.qrc
-
-LIBS += "$$PWD/libfftw3-3.dll"
-
-DISTFILES += \
-    libfftw3-3.dll
