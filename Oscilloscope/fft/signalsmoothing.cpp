@@ -20,8 +20,8 @@ QVector<std::complex<double>> signalSmoothing::expFilter(QVector<std::complex<do
     buffer.imag(data[0].imag());
     out.push_back(buffer);
     for(int i=1;i<S;i++){
-        buffer.real(data[i-1].real());
-        buffer.imag(data[i-1].imag());
+        buffer.real(coef*data[i-1].real()+(1-coef)*out[i-1].real());
+        buffer.imag(coef*data[i-1].imag()+(1-coef)*out[i-1].imag());
         out.push_back(buffer);
     }
     return out;
