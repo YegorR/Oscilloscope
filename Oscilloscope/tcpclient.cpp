@@ -11,8 +11,7 @@ namespace oscilloscope {
     }
 
     Frame *TcpClient::read() {
-        QByteArray data = _socket->readAll();
-        return _parser.parse(data);
+        return _parser.parse(_socket);
     }
 
     void TcpClient::readyRead() {

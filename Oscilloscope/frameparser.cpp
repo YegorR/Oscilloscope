@@ -18,25 +18,41 @@ namespace oscilloscope {
 
     /// ПАРСИНГ ПОЛУЧЕННЫХ ДАННЫХ
 
-    Frame *FrameParser::parse(QByteArray &data) {
-        Frame *frame = new Frame();
-
-        QDataStream stream(&data, QIODevice::ReadOnly);
+    Frame *FrameParser::parse(QAbstractSocket* socket) {
+        static quint32 frameSize = 0;
+        QDataStream stream(socket);
         stream.setByteOrder(QDataStream::LittleEndian);
 
-        quint32 size;
-        stream >> size;
+        if (frameSize == 0) {
+            if (socket->bytesAvailable() < 4) {
+                return nullptr;
+              }
+            stream >> frameSize;
+            if (frameSize >= _MAX_FRAME_SIZE) {
+                frameSize = 0;
+                return nullptr;
+              }
+          }
+        if (socket->bytesAvailable() < frameSize - 4) {
+            return nullptr;
+          }
+        frameSize = 0;
+        Frame *frame = new Frame();
 
-        if (static_cast<quint32>(data.size()) != size) {
-            // Error
-        }
+        //qDebug() << size << data.size();
 
         stream.skipRawData(4);                  // Версия протокола
         stream.skipRawData(2);                  // Reserv
 
         stream >> frame->_frameNumber;
 
-        stream.skipRawData(1);
+        quint8 frameType;
+        stream >> frameType;
+        if (frameType != 1) {
+            stream.skipRawData(frameSize - 12);
+            delete frame;
+            return nullptr;
+          }
 
         frame->_channelName = readString(stream);
 
@@ -77,6 +93,9 @@ namespace oscilloscope {
         frame->_pointSize = pointSize;
 
         if (frame->_isComplex) {
+            if (socket->bytesAvailable() < N * pointSize * 2) {
+                N = socket->bytesAvailable();
+              }
             if (frame->_isFloat) {
                 if (pointSize == 4) {
                     readComplexPoint<float>(stream, N, frame->_points);
@@ -95,6 +114,9 @@ namespace oscilloscope {
                 }
             }
         } else {
+            if (socket->bytesAvailable() < N * pointSize) {
+                N = socket->bytesAvailable();
+              }
             if (frame->_isFloat) {
                 if (pointSize == 4) {
                     readSimplePoint<float>(stream, N, frame->_points);
@@ -156,7 +178,7 @@ namespace oscilloscope {
         for (uint i = 0; i < N; ++i) {
             T point;
             stream >> point;
-            qDebug() << point;
+            //qDebug() << point;
             points.push_back(point);
         }
     }
