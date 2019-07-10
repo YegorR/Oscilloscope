@@ -2,15 +2,12 @@
 #define FRAMEPARSER_H
 
 #include "frame.h"
-#include <QAbstractSocket>
+#include <QByteArray>
 
 namespace oscilloscope {
     class FrameParser {
-    private:
-      const quint32 _MAX_FRAME_SIZE = 4096;
     public:
-        FrameParser();
-        Frame *parse(QByteArray& data);
+        static Frame *parse(QByteArray& data);
     };
 }
 

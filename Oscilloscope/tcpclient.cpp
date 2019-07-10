@@ -33,7 +33,7 @@ namespace oscilloscope {
                 QByteArray data = _socket->read(frameSize - 4);
                 frameSize = 0;
                 qDebug() << "Read to parse";
-                return _parser.parse(data);
+                return FrameParser::parse(data);
               }
           }
         if (frameSize <= 4) {
