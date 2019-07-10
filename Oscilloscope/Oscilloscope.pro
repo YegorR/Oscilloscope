@@ -44,7 +44,8 @@ SOURCES += \
     frameparser.cpp \
     kiss_fft.cpp \
     signalsmoothing.cpp \
-    display.cpp
+    display.cpp \
+    trigger.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -70,7 +71,8 @@ HEADERS += \
     _kiss_fft_guts.h \
     signalsmoothing.h \
     enums.h \
-    display.h
+    display.h \
+    trigger.h
 
 FORMS += \
         mainwindow.ui \
