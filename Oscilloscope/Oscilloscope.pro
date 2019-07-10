@@ -43,7 +43,8 @@ SOURCES += \
     server.cpp \
     tcpserver.cpp \
     tcpclient.cpp \
-    frameparser.cpp
+    frameparser.cpp \
+    udpserver.cpp
 
 HEADERS += \
     signalsmoothing.h \
@@ -68,7 +69,8 @@ HEADERS += \
     server.h \
     tcpserver.h \
     tcpclient.h \
-    frameparser.h
+    frameparser.h \
+    udpserver.h
 
 FORMS += \
         mainwindow.ui \
