@@ -31,6 +31,8 @@ namespace oscilloscope {
 
     void TcpServer::receiveData(TcpClient *client) {
         Frame *newFrame = client->read();
-        emit frame(newFrame);
+        if (newFrame != nullptr) {
+             emit frame(newFrame);
+          }
     }
 }

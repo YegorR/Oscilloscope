@@ -8,6 +8,7 @@
 
 namespace oscilloscope {
     QString readString(QDataStream&);
+    void debugData(QByteArray data);
 
     template<typename T> void readSimplePoint(QDataStream&, uint, QVector<double>&);
     template<typename T> void readComplexPoint(QDataStream&, uint, QVector<double>&);
@@ -18,29 +19,12 @@ namespace oscilloscope {
 
     /// ПАРСИНГ ПОЛУЧЕННЫХ ДАННЫХ
 
-    Frame *FrameParser::parse(QAbstractSocket* socket) {
-        static quint32 frameSize = 0;
-        QDataStream stream(socket);
-        stream.setByteOrder(QDataStream::LittleEndian);
-
-        if (frameSize == 0) {
-            if (socket->bytesAvailable() < 4) {
-                return nullptr;
-              }
-            stream >> frameSize;
-            if (frameSize >= _MAX_FRAME_SIZE) {
-                frameSize = 0;
-                return nullptr;
-              }
-          }
-        if (socket->bytesAvailable() < frameSize - 4) {
-            return nullptr;
-          }
-        frameSize = 0;
+    Frame *FrameParser::parse(QByteArray& data) {
         Frame *frame = new Frame();
 
-        //qDebug() << size << data.size();
-
+        debugData(data);
+        QDataStream stream(data);
+        stream.setByteOrder(QDataStream::LittleEndian);
         stream.skipRawData(4);                  // Версия протокола
         stream.skipRawData(2);                  // Reserv
 
@@ -49,7 +33,6 @@ namespace oscilloscope {
         quint8 frameType;
         stream >> frameType;
         if (frameType != 1) {
-            stream.skipRawData(frameSize - 12);
             delete frame;
             return nullptr;
           }
@@ -59,6 +42,7 @@ namespace oscilloscope {
         frame->_xMeasure = readString(stream);
         frame->_yMeasure = readString(stream);
 
+        stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::SinglePrecision);
         stream >> frame->_divXValue;
         stream >> frame->_divYValue;
 
@@ -93,13 +77,12 @@ namespace oscilloscope {
         frame->_pointSize = pointSize;
 
         if (frame->_isComplex) {
-            if (socket->bytesAvailable() < N * pointSize * 2) {
-                N = socket->bytesAvailable();
-              }
             if (frame->_isFloat) {
                 if (pointSize == 4) {
+                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::SinglePrecision);
                     readComplexPoint<float>(stream, N, frame->_points);
                 } else if (pointSize == 8) {
+                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::DoublePrecision);
                     readComplexPoint<double>(stream, N, frame->_points);
                 }
             } else {
@@ -114,13 +97,12 @@ namespace oscilloscope {
                 }
             }
         } else {
-            if (socket->bytesAvailable() < N * pointSize) {
-                N = socket->bytesAvailable();
-              }
             if (frame->_isFloat) {
                 if (pointSize == 4) {
+                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::SinglePrecision);
                     readSimplePoint<float>(stream, N, frame->_points);
                 } else if (pointSize == 8) {
+                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::DoublePrecision);
                     readSimplePoint<double>(stream, N, frame->_points);
                 }
             } else {
@@ -135,8 +117,8 @@ namespace oscilloscope {
                 }
             }
 
-            for (int i = 1; i < (int)N; i++) {
-                int x = frame->_offsetX.at(i - 1) + frame->_divXValue;
+            for (int i = 1; i < static_cast<int>(N); i++) {
+                double x = frame->_offsetX.at(i - 1) + static_cast<double>(frame->_divXValue);
                 frame->_offsetX.push_back(x);
             }
         }
@@ -196,6 +178,22 @@ namespace oscilloscope {
 
             points.push_back(realPoint);
             points.push_back(imagPoint);
+        }
+    }
+
+    void debugData(QByteArray data) {
+      data = data.toHex();
+      qDebug() << "===============================================================";
+      QString line;
+      for (auto i = 0; i < data.size(); ++i) {
+          line += data[i];
+          if ((i + 1) % 8 == 0) {
+              qDebug() << line;
+              line.clear();
+            }
+        }
+      if (!line.isEmpty()) {
+          qDebug() << line;
         }
     }
 }

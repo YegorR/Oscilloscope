@@ -10,7 +10,7 @@ namespace oscilloscope {
       const quint32 _MAX_FRAME_SIZE = 4096;
     public:
         FrameParser();
-        Frame *parse(QAbstractSocket* socket);
+        Frame *parse(QByteArray& data);
     };
 }
 
