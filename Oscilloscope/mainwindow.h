@@ -9,6 +9,7 @@
 
 #include "simplescope.h"
 #include "globalchannellist.h"
+#include "channelcontroller.h"
 
 namespace Ui {
     class MainWindow;
@@ -26,13 +27,16 @@ namespace oscilloscope {
     private slots:
         void on_createSimpleScope_pressed();
         void deleteScope();
+
         void channelDelete(const QString name);
+        void channelUpdate();
 
     private:
         Ui::MainWindow *ui;
 
-        QList<simplescope *> _scopes;
-        globalChannelList *_channels;
+        QList<SimpleScope *> _scopes;
+        GlobalChannelList *_channels;
+        ChannelController *_channelController;
 
         int countScopes;
     };

@@ -1,137 +1,147 @@
 #include "frameparser.h"
+
 #include <QDataStream>
 #include <QIODevice>
 #include <complex>
 
+#include <QDebug>
 
-QString readString(QDataStream&);
-template<typename T> void readSimplePoint(QDataStream&, uint, QVector<QVariant>&);
-template<typename T> void readComplexPoint(QDataStream&, uint, QVector<QVariant>&);
+namespace oscilloscope {
+    QString readString(QDataStream &);
 
-FrameParser::FrameParser()
-{
+    template<typename T> void readPoints(QDataStream &, uint, QVector<std::complex<double>> &, bool complex = false);
 
-}
+    /// КОНСТРУКТОР
 
-Frame* FrameParser::parse(QByteArray& data) {
-  Frame* frame = new Frame();
+    FrameParser::FrameParser() {}
 
-  QDataStream stream(&data, QIODevice::ReadOnly);
+    /// ПАРСИНГ ПОЛУЧЕННЫХ ДАННЫХ
 
-  quint32 size; stream >> size;
-  if (static_cast<quint32>(data.size()) != size) {
-      //error
-    }
-  stream.skipRawData(4);  //protocol version
-  stream.skipRawData(2);  //reserv
-  stream >> frame->frameNumber;
+    Frame *FrameParser::parse(QByteArray &data) {
+        Frame *frame = new Frame();
 
-  frame->channelName = readString(stream);
-  frame->xMeasure = readString(stream);
-  frame->yMeasure = readString(stream);
+        QDataStream stream(data);
+        stream.setByteOrder(QDataStream::LittleEndian);
 
-  float divXValue; stream >> divXValue; //float - 32 bit?
-  frame->divisionXValue = divXValue;
+        stream.skipRawData(4);                  // Версия протокола
+        stream.skipRawData(2);                  // Reserv
 
-  float divYValue; stream >> divYValue; //float - 32 bit?
-  frame->divisionYValue = divYValue;
+        stream >> frame->_frameNumber;
 
-  quint32 N; stream >> N;
-  qint32 offsetX; stream >> offsetX;
-  frame->offsetX = offsetX;
+        quint8 frameType;
+        stream >> frameType;
+        if (frameType != 1) {
+            delete frame;
+            return nullptr;
+        }
 
-  qint32 time; stream >> time;
-  frame->time = time;
+        frame->_channelName = readString(stream);
 
-  qint8 isBigEndian; stream >> isBigEndian;
-  if (static_cast<bool>(isBigEndian)) {
-      stream.setByteOrder(QDataStream::BigEndian);
-    } else {
-      stream.setByteOrder(QDataStream::LittleEndian);
-    }
+        frame->_xMeasure = readString(stream);
+        frame->_yMeasure = readString(stream);
 
-  quint8 isComplex; stream >> isComplex;
-  frame->isComplex = static_cast<bool>(isComplex);
+        stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::SinglePrecision);
 
-  quint8 isFloat; stream >> isFloat;
-  frame->isFloat = static_cast<bool>(isFloat);
+        stream >> frame->_divXValue;
+        stream >> frame->_divYValue;
 
-  quint8 pointSize; stream >> pointSize;
-  frame->pointSize = pointSize;
+        quint32 N;
+        stream >> N;
 
-  if (frame->isComplex) {
-      if (frame->isFloat) {
-          if (pointSize == 4) {
-              readComplexPoint<float>(stream, N, frame->points);
-            }
-          else if (pointSize == 8) {
-              readComplexPoint<double>(stream, N, frame->points);
+        quint32 offsetX;
+        stream >> offsetX;
+        frame->_offsetX.push_back(offsetX * frame->_divXValue);
+
+        stream >> frame->_time;
+
+        qint8 isBigEndian;
+        stream >> isBigEndian;
+
+        if (static_cast<bool>(isBigEndian)) stream.setByteOrder(QDataStream::BigEndian);
+            else stream.setByteOrder(QDataStream::LittleEndian);
+
+        quint8 isComplex;
+        stream >> isComplex;
+        frame->_isComplex = static_cast<bool>(isComplex);
+
+        quint8 isFloat;
+        stream >> isFloat;
+        frame->_isFloat = static_cast<bool>(isFloat);
+
+        quint8 pointSize;
+        stream >> pointSize;
+        frame->_pointSize = pointSize;
+
+        if (frame->_isFloat) {
+            if (pointSize == 4) readPoints<float>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 8) {
+                stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::DoublePrecision);
+                readPoints<double>(stream, N, frame->_points, frame->_isComplex);
             }
         } else {
-          if (pointSize == 1) {
-              readComplexPoint<qint8>(stream, N, frame->points);
-            } else if (pointSize == 2) {
-              readComplexPoint<quint16>(stream, N, frame->points);
-            } else if (pointSize == 4) {
-              readComplexPoint<quint32>(stream, N, frame->points);
-            } else if (pointSize == 8) {
-              readComplexPoint<quint64>(stream, N, frame->points);
-            }
+            if (pointSize == 1) readPoints<qint8>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 2) readPoints<quint16>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 4) readPoints<quint32>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 8) readPoints<quint64>(stream, N, frame->_points, frame->_isComplex);
         }
-    } else {
-      if (frame->isFloat) {
-          if (pointSize == 4) {
-              readSimplePoint<float>(stream, N, frame->points);
+
+        for (int i = 1; i < (int)N; i++)
+            frame->_offsetX.push_back(frame->_offsetX.at(i - 1) + frame->_divXValue);
+
+
+        return frame;
+    }
+
+    /// СЧИТЫВАНИЕ ФОРМАТА STRING ИЗ ПОТОКА
+
+    QString readString(QDataStream &stream) {
+        quint8 strSize;
+        stream >> strSize;
+
+        if (strSize != 0) {
+            QString result;
+
+            for (int i = 0; i < strSize; i++) {
+                quint8 character;
+                stream >> character;
+                result.append(QChar(character));
             }
-          else if (pointSize == 8) {
-              readSimplePoint<double>(stream, N, frame->points);
+
+            if ((strSize + 1) % 4 != 0) {
+                stream.skipRawData(4 - ((strSize + 1) % 4));
+            }
+
+            return result;
+        } else {
+            stream.skipRawData(3);
+
+            return QString();
+        }
+    }
+
+    /// СЧИТЫВАНИЕ ТОЧЕК
+
+    template<typename T>
+    void readPoints(QDataStream &stream, uint N, QVector<std::complex<double>> &points, bool complex) {
+        if (complex) {
+            T realPoint;
+            T imagPoint;
+
+            for (uint i = 0; i < N; ++i) {
+                stream >> realPoint;
+                stream >> imagPoint;
+
+                std::complex<double> point(realPoint, imagPoint);
+
+                points.push_back(point);
             }
         } else {
-          if (pointSize == 1) {
-              readSimplePoint<qint8>(stream, N, frame->points);
-            } else if (pointSize == 2) {
-              readSimplePoint<quint16>(stream, N, frame->points);
-            } else if (pointSize == 4) {
-              readSimplePoint<quint32>(stream, N, frame->points);
-            } else if (pointSize == 8) {
-              readSimplePoint<quint64>(stream, N, frame->points);
+            T point;
+
+            for (uint i = 0; i < N; ++i) {
+                stream >> point;
+                points.push_back(point);
             }
         }
-    }
-  return frame;
-}
-
-QString readString(QDataStream& stream) {
-  quint8 strSize;
-  stream >> strSize;
-  if (strSize != 0) {
-      char* charString = new char[strSize];
-      uint realSize;
-      stream.readBytes(charString, realSize);
-      QString result = QString::fromLocal8Bit(charString);
-      delete [] charString;
-      stream.skipRawData((realSize + 1) % 4);
-      return result;
-    } else {
-      stream.skipRawData(3);
-      return QString();
-    }
-}
-
-template<typename T>
-void readSimplePoint(QDataStream& stream, uint N, QVector<QVariant>& points) {
-  for (uint i = 0; i < N; ++i) {
-      T point; stream >> point;
-      points.push_front(QVariant(point));
-    }
-}
-
-template<typename T>
-void readComplexPoint(QDataStream& stream, uint N, QVector<QVariant>& points) {
-  for (uint i = 0; i < N; ++i) {
-      T realPoint; stream >> realPoint;
-      T imagPoint; stream >> imagPoint;
-      points.push_front(QVariant(realPoint));
-      points.push_front(QVariant(imagPoint));
     }
 }

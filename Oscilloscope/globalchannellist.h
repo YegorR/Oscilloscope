@@ -8,20 +8,29 @@
 
 #include "channellist.h"
 #include "globalchannellistview.h"
+#include "channel.h"
 
 namespace oscilloscope {
-    class globalChannelList : public channelList {
+    class GlobalChannelList : public iChannelList {
         Q_OBJECT
 
     public:
-        globalChannelList(QLayout *parent = 0);
+        GlobalChannelList(QLayout *parent = 0);
 
-        void add(QString channel, bool alive = true);
+        void add(iChannel *channel, bool alive = true);
+        int indexByName(const QString name) const;
 
-        ~globalChannelList();
+        ~GlobalChannelList();
+
+    public slots:
+        void channelUpdate(Channel *);
 
     private:
-        globalChannelListView *_channelsView;
+        GlobalChannelListView *_channelsView;
+
+    signals:
+        void channelUpdated();
+
     };
 }
 

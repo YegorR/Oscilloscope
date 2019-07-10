@@ -1,29 +1,49 @@
 #include "datastream.h"
 
-DataStream::DataStream(QString channelName) : _channelName(channelName) {
+namespace oscilloscope {
+    /// КОНСТРУКТОР СОЗДАНИЯ ДАННЫХ НА ОСНОВЕ ПОЛУЧЕННОГО КАДРА
 
-}
-
-QString DataStream::channelName() const {
-    return _channelName;
-}
-
-void DataStream::update(Frame* frame) {
-    _mutex.lock();
-    if (_frame != nullptr) {
-      delete _frame;
+    DataStream::DataStream(Frame *frame) {
+        _frame = frame;
     }
 
-    _frame = frame;
-    _mutex.unlock();
-    update();
+    /// ОБНОВЛЕНИЕ КАДРА
+
+    void DataStream::update(Frame *frame) {
+        if (_frame != nullptr)
+            delete _frame;
+
+        _frame = frame;
+
+        emit update();
+    }
+
+    void DataStream::insert(Frame *frame) {
+        for (int i = 0; i < _frame->_points.length(); i++) {
+            if (_frame->_offsetX.at(i) >= frame->_offsetX.at(0)) {
+                for (int j = i, k = 0; k < frame->_points.length(); j++, k++) {
+                    _frame->_offsetX.insert(j, frame->_offsetX.at(k));
+                    _frame->_points.insert(j, frame->_points.at(k));
+                }
+
+                return;
+            }
+        }
+
+        _frame->_offsetX.append(frame->_offsetX);
+        _frame->_points.append(frame->_points);
+    }
+
+    /// ПОЛУЧЕНИЕ КАДРА
+
+    Frame *DataStream::frame() const {
+        return _frame;
+    }
+
+    /// ДЕСТРУКТОР
+
+    DataStream::~DataStream() {
+        if (_frame) delete _frame;
+    }
 }
 
-Frame* DataStream::frame() {
-    _mutex.lock();
-    Frame* result = _frame;
-    _frame = nullptr;
-    _mutex.unlock();
-
-    return result;
-}

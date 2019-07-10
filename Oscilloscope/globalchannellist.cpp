@@ -1,29 +1,51 @@
-#include <QLayout>
-
 #include "globalchannellist.h"
 
 namespace oscilloscope {
-    globalChannelList::globalChannelList(QLayout *parent) : channelList() {
-        _channelsView = new globalChannelListView();
+    /// КОНСТРУКТОР СПИСКА ОРИГИНАЛЬНЫХ КАНАЛОВ
+
+    GlobalChannelList::GlobalChannelList(QLayout *parent) : iChannelList() {
+        _channelsView = new GlobalChannelListView();
 
         connect(_channelsView, SIGNAL(channelDeleted(const QString)), this, SLOT(channelDelete(const QString)));
-
-        add("Канал 1");
-        add("Канал 2", false);
-        add("Канал 3");
 
         if (parent) parent->addWidget(_channelsView);
             else _channelsView->show();
     }
 
-    void globalChannelList::add(QString channel, bool alive) {
-        channelList::add(channel);
-        _channelsView->addItem(channel);
+    /// ОБНОВЛЕНИЕ ОТОБРАЖЕНИЯ КАНАЛА
+
+    void GlobalChannelList::channelUpdate(Channel *channel) {
+        if (channel->status()) _channelsView->item(_channels->indexOf(channel))->setForeground(CH_ALIVE);
+            else _channelsView->item(_channels->indexOf(channel))->setForeground(CH_DEAD);
+
+        _channelsView->repaint();
+
+        emit channelUpdated();
+    }
+
+    /// ПОЛУЧЕНИЕ ИНДЕКСА ОРИГИНАЛЬНОГО КАНАЛА ПО ЕГО ИМЕНИ
+
+    int GlobalChannelList::indexByName(const QString name) const {
+        for (int i = 0; i < _channels->length(); i++)
+            if (_channels->at(i)->data()->frame()->_channelName == name)
+                return i;
+
+        return -1;
+    }
+
+    /// ДОБАВЛЕНИЕ ОРИГИНАЛЬНОГО КАНАЛА В СПИСОК
+
+    void GlobalChannelList::add(iChannel *channel, bool alive) {
+        iChannelList::add(channel);
+        _channelsView->addItem(channel->data()->frame()->_channelName);
 
         if (alive) _channelsView->item(_channelsView->count() - 1)->setTextColor(CH_ALIVE);
             else _channelsView->item(_channelsView->count() - 1)->setTextColor(CH_DEAD);
     }
 
-    globalChannelList::~globalChannelList() {}
-}
+    /// ДЕСТРУКТОР
 
+    GlobalChannelList::~GlobalChannelList() {
+        delete _channelsView;
+    }
+}

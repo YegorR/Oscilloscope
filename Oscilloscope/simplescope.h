@@ -3,39 +3,51 @@
 #ifndef SIMPLESCOPE_H
 #define SIMPLESCOPE_H
 
+#include <QWidget>
+#include <QMetaEnum>
+
+#include <QtCharts/QtCharts>
+QT_CHARTS_USE_NAMESPACE
+
+#include "localchannellist.h"
+#include "globalchannellist.h"
+#include "display.h"
+
 #define SIMPLESCOPE_NAME_DEF "Неопределенный дисплей"
 
-#include <QWidget>
-#include <QListWidget>
-
-#include "localchannellistview.h"
-#include "channellist.h"
-
 namespace Ui {
-    class simplescope;
+    class SimpleScope;
 }
 
 namespace oscilloscope {
-    class simplescope : public QWidget {
+    class SimpleScope : public QWidget {
         Q_OBJECT
 
     public:
-        explicit simplescope(QWidget *parent = 0, const QString &name = SIMPLESCOPE_NAME_DEF, channelList *globalList = 0);
+        explicit SimpleScope(QWidget *parent = 0, const QString &name = SIMPLESCOPE_NAME_DEF, GlobalChannelList *globalList = 0);
 
-        localChannelListView *localListView();
+        LocalChannelList *localList() const;
 
-        ~simplescope();
+        int colorIndex(QColor color) const;
+        QColor colorByIndex(int index) const;
+
+        ~SimpleScope();
 
     private:
-        Ui::simplescope *ui;
+        Ui::SimpleScope *ui;
 
-        channelList *_globalList;
-        localChannelListView *_localListView;
+        GlobalChannelList *_globalList;
+        LocalChannelList *_channels;
 
+        Display *_display;
     protected:
-        void closeEvent(QCloseEvent *event);
+        void paintEvent(QPaintEvent *);
+
     private slots:
-        void on_DublicateChannel_pressed();
+        void on_createDublicate_pressed();
+
+    public slots:
+        void displayUpdate();
     };
 }
 

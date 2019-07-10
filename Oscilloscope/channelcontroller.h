@@ -1,27 +1,33 @@
+///     ОБРАБОТЧИК ПОЛУЧЕННЫХ ДАННЫХ
+
 #ifndef CHANNELCONTROLLER_H
 #define CHANNELCONTROLLER_H
 
 #include <QObject>
-#include <QVector>
-#include "frame.h"
+
 #include "server.h"
-#include "Channel/ChannelList/globalchannellist.h"
+#include "frame.h"
+#include "globalchannellist.h"
 
-class ChannelController : public QObject
-{
-  Q_OBJECT
+namespace oscilloscope {
+    class ChannelController : public QObject {
+      Q_OBJECT
 
-private:
-  Server* _tcpServer = nullptr;
-  //Server& _udpServer;
-  GlobalChannelList _globalChannelList;
-public:
-  explicit ChannelController(QObject *parent = nullptr);
-  bool createTcpServer(quint16 port);
-signals:
+    private:
+        Server *_tcpServer;
 
-private slots:
-  void receiveFrame(Frame*);
-};
+        GlobalChannelList *_globalChannelList;
 
-#endif // CHANNELCONTROLLER_H
+    public:
+        explicit ChannelController(GlobalChannelList *channels);
+        bool createTcpServer(quint16 port);
+
+    private slots:
+        void receiveFrame(Frame *);
+
+    signals:
+        void channelUpdated();
+    };
+}
+
+#endif

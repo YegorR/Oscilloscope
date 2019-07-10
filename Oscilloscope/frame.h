@@ -1,26 +1,35 @@
+///     СТРУКТУРА ПОЛУЧАЕМОГО КАДРА ДАННЫХ
+
 #ifndef FRAME_H
 #define FRAME_H
 
 #include <QString>
 #include <QVector>
-#include <QVariant>
+#include <complex>
 
+namespace oscilloscope {
+    struct Frame {
+        quint8 _frameNumber;
 
-struct Frame {
-  quint8 frameNumber;
-  QString channelName;
-  QString xMeasure;
-  QString yMeasure;
-  float divisionXValue;
-  float divisionYValue;
-  qint32 offsetX;
-  qint32 time;
+        QString _channelName;
 
-  bool isComplex;
-  bool isFloat;
-  quint8 pointSize;
+        QString _xMeasure;
+        QString _yMeasure;
 
-  QVector <QVariant> points;
-};
+        float _divXValue;
+        float _divYValue;
 
-#endif // FRAME_H
+        QVector<double> _offsetX;
+
+        qint32 _time;
+
+        bool _isComplex;
+        bool _isFloat;
+
+        quint8 _pointSize;
+
+        QVector<std::complex<double>> _points;
+    };
+}
+
+#endif

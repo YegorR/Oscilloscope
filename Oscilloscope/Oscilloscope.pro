@@ -1,6 +1,12 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2019-06-26T11:47:07
+#
+#-------------------------------------------------
+
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network charts
 
 TARGET = Oscilloscope
 TEMPLATE = app
@@ -16,44 +22,58 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 SOURCES += \
-    main.cpp \
-    mainwindow.cpp \
-    qcustomplot.cpp \
+        main.cpp \
+        mainwindow.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
     channellist.cpp \
     globalchannellist.cpp \
+    ilistview.cpp \
+    localchannellist.cpp \
+    attributes.cpp \
+    ichannel.cpp \
     datastream.cpp \
+    channel.cpp \
+    dublicatechannel.cpp \
     channelcontroller.cpp \
-    frameparser.cpp \
     server.cpp \
+    tcpserver.cpp \
     tcpclient.cpp \
-    tcpserver.cpp
+    frameparser.cpp \
+    kiss_fft.cpp \
+    signalsmoothing.cpp \
+    display.cpp
 
 HEADERS += \
-    mainwindow.h \
-    qcustomplot.h \
+        mainwindow.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
     globalchannellist.h \
     channellist.h \
-    channelcontroller.h \
+    ilistview.h \
+    localchannellist.h \
+    attributes.h \
+    ichannel.h \
+    datastream.h \
     frame.h \
-    frameparser.h \
+    channel.h \
+    dublicatechannel.h \
+    channelcontroller.h \
     server.h \
+    tcpserver.h \
     tcpclient.h \
-    tcpserver.h
-
-HEADERS += \
-    mainwindow.h \
-    datastream.h
+    frameparser.h \
+    kiss_fft.h \
+    _kiss_fft_guts.h \
+    signalsmoothing.h \
+    enums.h \
+    display.h
 
 FORMS += \
-    mainwindow.ui \
+        mainwindow.ui \
     simplescope.ui
 
 RESOURCES += \
