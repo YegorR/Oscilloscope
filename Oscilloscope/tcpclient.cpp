@@ -8,15 +8,15 @@ namespace oscilloscope {
     TcpClient::TcpClient(QTcpSocket* socket, QObject* parent) : QObject (parent) {
         _socket = socket;
 
-        connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
+        connect(socket, SIGNAL(readyRead()), this, SLOT(read()));
         connect(socket, SIGNAL(disconnected()), this, SLOT(disconnect()));
     }
 
-    Frame *TcpClient::read() {
+    void TcpClient::read() {
         static quint32 frameSize = 0;
         if (frameSize == 0) {
             if (_socket->bytesAvailable() < 4) {
-                return nullptr;
+                return;
               } else {
                 QDataStream stream(_socket->read(4));
                 stream.setByteOrder(QDataStream::LittleEndian);
@@ -27,23 +27,19 @@ namespace oscilloscope {
         if (frameSize > 4) {
             if (_socket->bytesAvailable() < frameSize - 4) {
                 qDebug() << "_socket->bytesAvailable() < frameSize - 4";
-                return nullptr;
+                return;
               }
             else {
                 QByteArray data = _socket->read(frameSize - 4);
                 frameSize = 0;
                 qDebug() << "Read to parse";
-                return FrameParser::parse(data);
+                emit frameIsRead(FrameParser::parse(data));
+                read();
               }
           }
         if (frameSize <= 4) {
             frameSize = 0;
           }
-        return nullptr;
-    }
-
-    void TcpClient::readyRead() {
-        emit readyRead(this);
     }
 
     void TcpClient::disconnect() {

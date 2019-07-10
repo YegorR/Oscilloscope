@@ -26,8 +26,7 @@ namespace oscilloscope {
 
     private slots:
         void receiveConnection();
-        void receiveData(TcpClient *client);
-    };
+      };
 }
 
 #endif // TCPSERVER_H

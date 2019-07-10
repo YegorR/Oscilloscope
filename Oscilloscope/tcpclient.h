@@ -15,16 +15,13 @@ namespace oscilloscope {
         QTcpSocket* _socket;
     public:
         TcpClient(QTcpSocket* client, QObject* parent = nullptr);
-
-        Frame *read();
-
         ~TcpClient();
 
     signals:
-        void readyRead(TcpClient*);
+        void frameIsRead(Frame*);
 
     private slots:
-        void readyRead();
+        void read();
         void disconnect();
 
     };

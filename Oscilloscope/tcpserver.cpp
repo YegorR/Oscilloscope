@@ -26,13 +26,6 @@ namespace oscilloscope {
         QTcpSocket *socket = _server->nextPendingConnection();
 
         TcpClient *client = new TcpClient(socket, this);
-        connect(client, SIGNAL(readyRead(TcpClient *)), this, SLOT(receiveData(TcpClient *)));
-    }
-
-    void TcpServer::receiveData(TcpClient *client) {
-        Frame *newFrame = client->read();
-        if (newFrame != nullptr) {
-             emit frame(newFrame);
-          }
+        connect(client, SIGNAL(frameIsRead(Frame*)), this, SIGNAL(frame(Frame*)));
     }
 }
