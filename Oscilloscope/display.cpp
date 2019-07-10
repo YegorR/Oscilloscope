@@ -25,6 +25,8 @@ namespace oscilloscope {
 
         _minY = -10;
         _maxY = 10;
+
+        this->setStyleSheet("background-color: rgb(64, 64, 64)");
     }
 
     void Display::mousePressEvent(QMouseEvent *event) {

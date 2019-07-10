@@ -44,7 +44,7 @@ namespace oscilloscope {
     void MainWindow::on_createSimpleScope_pressed() {
         SimpleScope *scope = new SimpleScope(0, "Дисплей " + QString::number(countScopes), _channels);
         scope->show();
-        scope->move(this->x() + this->width() + (30 + 10 * _scopes.length()), this->y() - (80 + 10 * _scopes.length()));
+        scope->move(this->x() + this->width() + (30 + 10 * _scopes.length()), this->y() - (10 * _scopes.length()));
 
         QObject::connect(scope, SIGNAL(destroyed()), this, SLOT(deleteScope()));
 
