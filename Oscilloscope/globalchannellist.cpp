@@ -1,6 +1,3 @@
-#include <QLayout>
-#include <QDebug>
-
 #include "globalchannellist.h"
 
 namespace oscilloscope {

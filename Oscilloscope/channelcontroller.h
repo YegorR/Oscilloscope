@@ -4,7 +4,6 @@
 #define CHANNELCONTROLLER_H
 
 #include <QObject>
-#include <QVector>
 
 #include "server.h"
 #include "frame.h"

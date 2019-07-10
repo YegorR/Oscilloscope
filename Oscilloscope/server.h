@@ -4,6 +4,7 @@
 #define SERVER_H
 
 #include <QObject>
+
 #include "frame.h"
 
 namespace oscilloscope {

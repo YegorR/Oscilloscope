@@ -7,20 +7,22 @@
 #include <QDebug>
 
 namespace oscilloscope {
-    QString readString(QDataStream&);
-    void debugData(QByteArray data);
+    QString readString(QDataStream &);
 
-    template<typename T> void readSimplePoint(QDataStream&, uint, QVector<double>&);
-    template<typename T> void readComplexPoint(QDataStream&, uint, QVector<double>&);
+    template<typename T> void readPoints(QDataStream &, uint, QVector<std::complex<double>> &, bool complex = false);
+
+    /// КОНСТРУКТОР
+
+    FrameParser::FrameParser() {}
 
     /// ПАРСИНГ ПОЛУЧЕННЫХ ДАННЫХ
 
-    Frame *FrameParser::parse(QByteArray& data) {
+    Frame *FrameParser::parse(QByteArray &data) {
         Frame *frame = new Frame();
 
-        debugData(data);
         QDataStream stream(data);
         stream.setByteOrder(QDataStream::LittleEndian);
+
         stream.skipRawData(4);                  // Версия протокола
         stream.skipRawData(2);                  // Reserv
 
@@ -31,7 +33,7 @@ namespace oscilloscope {
         if (frameType != 1) {
             delete frame;
             return nullptr;
-          }
+        }
 
         frame->_channelName = readString(stream);
 
@@ -39,6 +41,7 @@ namespace oscilloscope {
         frame->_yMeasure = readString(stream);
 
         stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::SinglePrecision);
+
         stream >> frame->_divXValue;
         stream >> frame->_divYValue;
 
@@ -47,18 +50,15 @@ namespace oscilloscope {
 
         quint32 offsetX;
         stream >> offsetX;
-        frame->_offsetX.push_back(offsetX);
+        frame->_offsetX.push_back(offsetX * frame->_divXValue);
 
         stream >> frame->_time;
 
         qint8 isBigEndian;
         stream >> isBigEndian;
 
-        if (static_cast<bool>(isBigEndian)) {
-            stream.setByteOrder(QDataStream::BigEndian);
-        } else {
-            stream.setByteOrder(QDataStream::LittleEndian);
-        }
+        if (static_cast<bool>(isBigEndian)) stream.setByteOrder(QDataStream::BigEndian);
+            else stream.setByteOrder(QDataStream::LittleEndian);
 
         quint8 isComplex;
         stream >> isComplex;
@@ -72,52 +72,22 @@ namespace oscilloscope {
         stream >> pointSize;
         frame->_pointSize = pointSize;
 
-        if (frame->_isComplex) {
-            if (frame->_isFloat) {
-                if (pointSize == 4) {
-                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::SinglePrecision);
-                    readComplexPoint<float>(stream, N, frame->_points);
-                } else if (pointSize == 8) {
-                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::DoublePrecision);
-                    readComplexPoint<double>(stream, N, frame->_points);
-                }
-            } else {
-                if (pointSize == 1) {
-                    readComplexPoint<qint8>(stream, N, frame->_points);
-                } else if (pointSize == 2) {
-                    readComplexPoint<qint16>(stream, N, frame->_points);
-                } else if (pointSize == 4) {
-                    readComplexPoint<qint32>(stream, N, frame->_points);
-                } else if (pointSize == 8) {
-                    readComplexPoint<qint64>(stream, N, frame->_points);
-                }
+        if (frame->_isFloat) {
+            if (pointSize == 4) readPoints<float>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 8) {
+                stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::DoublePrecision);
+                readPoints<double>(stream, N, frame->_points, frame->_isComplex);
             }
         } else {
-            if (frame->_isFloat) {
-                if (pointSize == 4) {
-                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::SinglePrecision);
-                    readSimplePoint<float>(stream, N, frame->_points);
-                } else if (pointSize == 8) {
-                    stream.setFloatingPointPrecision(QDataStream::FloatingPointPrecision::DoublePrecision);
-                    readSimplePoint<double>(stream, N, frame->_points);
-                }
-            } else {
-                if (pointSize == 1) {
-                    readSimplePoint<qint8>(stream, N, frame->_points);
-                } else if (pointSize == 2) {
-                    readSimplePoint<qint16>(stream, N, frame->_points);
-                } else if (pointSize == 4) {
-                    readSimplePoint<qint32>(stream, N, frame->_points);
-                } else if (pointSize == 8) {
-                    readSimplePoint<qint64>(stream, N, frame->_points);
-                }
-            }
-
-            for (int i = 1; i < static_cast<int>(N); i++) {
-                double x = frame->_offsetX.at(i - 1) + static_cast<double>(frame->_divXValue);
-                frame->_offsetX.push_back(x);
-            }
+            if (pointSize == 1) readPoints<qint8>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 2) readPoints<quint16>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 4) readPoints<quint32>(stream, N, frame->_points, frame->_isComplex);
+            else if (pointSize == 8) readPoints<quint64>(stream, N, frame->_points, frame->_isComplex);
         }
+
+        for (int i = 1; i < (int)N; i++)
+            frame->_offsetX.push_back(frame->_offsetX.at(i - 1) + frame->_divXValue);
+
 
         return frame;
     }
@@ -149,47 +119,29 @@ namespace oscilloscope {
         }
     }
 
-    /// СЧИТЫВАНИЕ ОБЫЧНЫХ ТОЧЕК
+    /// СЧИТЫВАНИЕ ТОЧЕК
 
     template<typename T>
-    void readSimplePoint(QDataStream& stream, uint N, QVector<double>& points) {
-        for (uint i = 0; i < N; ++i) {
-            T point;
-            stream >> point;
-            //qDebug() << point;
-            points.push_back(point);
-        }
-    }
-
-    /// СЧИТЫВАНИЕ КОМПЛЕКСНЫХ ТОЧЕК
-
-    template<typename T>
-    void readComplexPoint(QDataStream& stream, uint N, QVector<double>& points) {
-        for (uint i = 0; i < N; ++i) {
+    void readPoints(QDataStream &stream, uint N, QVector<std::complex<double>> &points, bool complex) {
+        if (complex) {
             T realPoint;
-            stream >> realPoint;
-
             T imagPoint;
-            stream >> imagPoint;
 
-            points.push_back(realPoint);
-            points.push_back(imagPoint);
-        }
-    }
+            for (uint i = 0; i < N; ++i) {
+                stream >> realPoint;
+                stream >> imagPoint;
 
-    void debugData(QByteArray data) {
-      data = data.toHex();
-      qDebug() << "===============================================================";
-      QString line;
-      for (auto i = 0; i < data.size(); ++i) {
-          line += data[i];
-          if ((i + 1) % 8 == 0) {
-              qDebug() << line;
-              line.clear();
+                std::complex<double> point(realPoint, imagPoint);
+
+                points.push_back(point);
             }
-        }
-      if (!line.isEmpty()) {
-          qDebug() << line;
+        } else {
+            T point;
+
+            for (uint i = 0; i < N; ++i) {
+                stream >> point;
+                points.push_back(point);
+            }
         }
     }
 }

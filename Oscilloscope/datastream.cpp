@@ -10,16 +10,28 @@ namespace oscilloscope {
     /// ОБНОВЛЕНИЕ КАДРА
 
     void DataStream::update(Frame *frame) {
-        _mutex.lock();
-
         if (_frame != nullptr)
             delete _frame;
 
         _frame = frame;
 
-        _mutex.unlock();
-
         emit update();
+    }
+
+    void DataStream::insert(Frame *frame) {
+        for (int i = 0; i < _frame->_points.length(); i++) {
+            if (_frame->_offsetX.at(i) >= frame->_offsetX.at(0)) {
+                for (int j = i, k = 0; k < frame->_points.length(); j++, k++) {
+                    _frame->_offsetX.insert(j, frame->_offsetX.at(k));
+                    _frame->_points.insert(j, frame->_points.at(k));
+                }
+
+                return;
+            }
+        }
+
+        _frame->_offsetX.append(frame->_offsetX);
+        _frame->_points.append(frame->_points);
     }
 
     /// ПОЛУЧЕНИЕ КАДРА

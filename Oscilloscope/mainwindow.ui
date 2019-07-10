@@ -22,6 +22,11 @@
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QMainWindow {
+	background-color: rgb(64, 64, 64);
+}</string>
+  </property>
   <property name="documentMode">
    <bool>false</bool>
   </property>
@@ -29,6 +34,12 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="1" column="0">
      <widget class="QPushButton" name="createSimpleScope">
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <property name="text">
        <string>Новый дисплей</string>
       </property>

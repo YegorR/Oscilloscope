@@ -5,14 +5,21 @@
 
 #include <QColor>
 
+#include "enums.h"
+
 namespace oscilloscope {
     struct Attributes {
-        QColor _color;
+        QColor _colorReal, _colorImg;
 
         int _lineType;
         int _lineWidth;
 
-        Attributes(QColor color = Qt::black, int lineType = 0, int lineWidth = 0);
+        double _expSmthCoef;
+        int _moveAvgCoef;
+
+        Enums::TransformateType _transformateType;
+
+        Attributes();
     };
 }
 

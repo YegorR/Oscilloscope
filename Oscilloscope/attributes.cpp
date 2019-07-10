@@ -3,9 +3,16 @@
 namespace oscilloscope {
     /// Конструктор атрибутов
 
-    Attributes::Attributes(QColor color, int lineType, int lineWidth) {
-        _color = color;
-        _lineType = lineType;
-        _lineWidth = lineWidth;
+    Attributes::Attributes() {
+        _colorReal = Qt::black;
+        _colorImg = Qt::black;
+
+        _lineType = 0;
+        _lineWidth = 1;
+
+        _expSmthCoef = 0.0;
+        _moveAvgCoef = 0;
+
+        _transformateType = Enums::TransformateType::None;
     }
 }

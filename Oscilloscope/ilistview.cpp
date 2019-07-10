@@ -1,6 +1,4 @@
-#include <QDropEvent>
-#include <QMimeData>
-#include <QDrag>
+#include <QKeyEvent>
 
 #include "ilistview.h"
 
@@ -11,7 +9,7 @@ namespace oscilloscope {
         this->setSelectionMode(QAbstractItemView::SingleSelection);
         this->setDropIndicatorShown(true);
 
-        setStyleSheet("color: Black");
+        setStyleSheet("color: Black;");
     }
 
     /// ОБРАБОТКА НАЖАТИЙ КЛАВИШ

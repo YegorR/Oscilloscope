@@ -3,8 +3,6 @@
 
 #include "dublicatechannel.h"
 
-#include <QDebug>
-
 namespace oscilloscope {
     /// Конструктор создания локального списка с указанием разменщения его View`ера
 

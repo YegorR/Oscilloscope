@@ -10,7 +10,8 @@
 #include <QString>
 #include <QObject>
 
-#include <datastream.h>
+#include "datastream.h"
+#include "enums.h"
 
 namespace oscilloscope {
     class iChannel : public QObject {
@@ -18,15 +19,14 @@ namespace oscilloscope {
     public:
         int channelType() const;
         DataStream *data() const;
+        QVector <std::complex<double>> points() const;
+
+        void transform(Enums::TransformateType type = Enums::TransformateType::None, double expSmthCoef = 0.0, int movingAvgCoef = 0);
 
         ~iChannel();
 
     private:
-        QVector <QVector<double>> _points;
-
-        QVector <QVector<double>> (*_transformFunc)(const DataStream *data);
-
-        void transform();
+        QVector <std::complex<double>> _points;
 
     protected:
         explicit iChannel(DataStream *data);
@@ -36,7 +36,10 @@ namespace oscilloscope {
         DataStream *_data;
     };
 
-    QVector <QVector<double>> bpf(const DataStream *data);
+    QVector<std::complex<double>> bpf(const QVector<std::complex<double>> &points);
+    QVector<std::complex<double>> threePointFilter(const QVector<std::complex<double>> &points);
+    QVector<std::complex<double>> expSmoothing(const QVector<std::complex<double>> &points, double coef);
+    QVector<std::complex<double>> movingAvg(const QVector<std::complex<double>> &points, int coef);
 }
 
 #endif

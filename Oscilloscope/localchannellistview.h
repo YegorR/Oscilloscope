@@ -29,6 +29,7 @@ namespace oscilloscope {
         void addChannel(QString name);
         void deleteChannel(const QString name);
         void deleteDublicates(const QString name);
+        void deleteAttribute(int index);
 
         ~LocalChannelListView();
 

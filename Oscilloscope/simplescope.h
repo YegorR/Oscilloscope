@@ -4,15 +4,16 @@
 #define SIMPLESCOPE_H
 
 #include <QWidget>
-#include <QListWidget>
 #include <QMetaEnum>
 
-#include "localchannellistview.h"
+#include <QtCharts/QtCharts>
+QT_CHARTS_USE_NAMESPACE
+
 #include "localchannellist.h"
 #include "globalchannellist.h"
+#include "display.h"
 
 #define SIMPLESCOPE_NAME_DEF "Неопределенный дисплей"
-#define COLORS_COUNT 5
 
 namespace Ui {
     class SimpleScope;
@@ -23,15 +24,6 @@ namespace oscilloscope {
         Q_OBJECT
 
     public:
-        enum Colors {
-            Black,
-            Red,
-            Blue,
-            Green,
-            Yellow
-        };
-        Q_ENUM(Colors)
-
         explicit SimpleScope(QWidget *parent = 0, const QString &name = SIMPLESCOPE_NAME_DEF, GlobalChannelList *globalList = 0);
 
         LocalChannelList *localList() const;
@@ -47,6 +39,7 @@ namespace oscilloscope {
         GlobalChannelList *_globalList;
         LocalChannelList *_channels;
 
+        Display *_display;
     protected:
         void paintEvent(QPaintEvent *);
 

@@ -6,7 +6,7 @@
 
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport network charts
 
 TARGET = Oscilloscope
 TEMPLATE = app
@@ -22,11 +22,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    qcustomplot.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
@@ -43,14 +41,13 @@ SOURCES += \
     server.cpp \
     tcpserver.cpp \
     tcpclient.cpp \
-    frameparser.cpp
+    frameparser.cpp \
+    kiss_fft.cpp \
+    signalsmoothing.cpp \
+    display.cpp
 
 HEADERS += \
-    signalsmoothing.h \
-    fft.h \
-    fftw3.h \
-    mainwindow.h \
-    qcustomplot.h \
+        mainwindow.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
@@ -68,7 +65,12 @@ HEADERS += \
     server.h \
     tcpserver.h \
     tcpclient.h \
-    frameparser.h
+    frameparser.h \
+    kiss_fft.h \
+    _kiss_fft_guts.h \
+    signalsmoothing.h \
+    enums.h \
+    display.h
 
 FORMS += \
         mainwindow.ui \

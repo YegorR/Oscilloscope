@@ -2,7 +2,6 @@
 #include <QMimeData>
 #include <QDrag>
 
-#include <QCheckBox>
 #include <QListWidgetItem>
 
 #include "localchannellistview.h"
@@ -97,6 +96,7 @@ namespace oscilloscope {
 
     void LocalChannelListView::itemDelete(QListWidgetItem *item) {
         emit channelDeleted(item->text());
+        deleteAttribute(this->row(item));
         delete this->takeItem(this->row(item));
     }
 
@@ -104,7 +104,7 @@ namespace oscilloscope {
 
     void LocalChannelListView::deleteChannel(const QString name) {
         QListWidgetItem *item = this->itemByName(name);
-
+        deleteAttribute(this->row(item));
         if (item) delete item;
     }
 
@@ -113,14 +113,23 @@ namespace oscilloscope {
     void LocalChannelListView::deleteDublicates(const QString name) {
         QListWidgetItem *item;
 
-        while ((item = this->itemDublicateByName(name)))
+        while ((item = this->itemDublicateByName(name))) {
+            deleteAttribute(this->row(item));
             delete item;
+        }
     }
 
     /// ПОЛУЧЕНИЕ АТРИБУТОВ ОТОБРАЖЕНИЯ КОНКРЕТНОГО КАНАЛА
 
     Attributes *LocalChannelListView::attribute(int index) const {
         return _attributes.at(index);
+    }
+
+    /// УДАЛЕНИЕ АТРИБУТА ИЗ СПИСКА
+
+    void LocalChannelListView::deleteAttribute(int index) {
+        delete _attributes.at(index);
+        _attributes.removeAt(index);
     }
 
     /// ДЕСТРУКТОР

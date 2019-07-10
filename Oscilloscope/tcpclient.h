@@ -5,23 +5,25 @@
 #include <QTcpSocket>
 
 #include "frame.h"
-#include "frameparser.h"
 
 namespace oscilloscope {
     class TcpClient : public QObject {
         Q_OBJECT
 
     private:
-        QTcpSocket* _socket;
+        QTcpSocket *_socket;
     public:
         TcpClient(QTcpSocket* client, QObject* parent = nullptr);
+
+        Frame *read();
+
         ~TcpClient();
 
     signals:
-        void frameIsRead(Frame*);
+        void readyRead(TcpClient*);
 
     private slots:
-        void read();
+        void readyRead();
         void disconnect();
 
     };

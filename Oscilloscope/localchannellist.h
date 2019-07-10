@@ -35,7 +35,6 @@ namespace oscilloscope {
 
     signals:
         void itemChecked();
-
     };
 }
 

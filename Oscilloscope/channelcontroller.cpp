@@ -4,28 +4,16 @@
 #include "datastream.h"
 #include "tcpserver.h"
 
+#include <QDebug>
+
 namespace oscilloscope {
     /// СОЗДАНИЕ КОНТРОЛЛЕРА КАНАЛОВ, ОТСЛЕЖИВАЮЩЕГО ПОЛУЧЕНИЕ НОВЫХ ДАННЫХ
 
     ChannelController::ChannelController(GlobalChannelList *channels) {
         _tcpServer = nullptr;
+        _globalChannelList = channels;
 
-        createTcpServer(8080);
-
-        _globalChannelList = channels;      
-
-        /*---------Тест данные------*/
-        Frame *f_1 = new Frame();
-        f_1->_channelName = "Канал 1";
-        Frame *f_2 = new Frame();
-        f_2->_channelName = "Канал 2";
-        Frame *f_3 = new Frame();
-        f_3->_channelName = "Канал 3";
-
-        receiveFrame(f_1);
-        receiveFrame(f_2);
-        receiveFrame(f_3);
-        /*---------Тест данные------*/
+        createTcpServer(8080);   
     }
 
     /// СОЗДАНИЕ ТСП СЕРВЕРА
@@ -60,7 +48,11 @@ namespace oscilloscope {
             connect(channel, SIGNAL(channelUpdated(Channel*)), _globalChannelList, SLOT(channelUpdate(Channel*)));
         } else {
             channel = static_cast<Channel *>(_globalChannelList->channels()->at(index));
-            channel->data()->update(frame);      
+
+            if (channel->data()->frame()->_time == frame->_time) {
+                channel->data()->insert(frame);
+            } else channel->data()->update(frame);
+
             channel->channelConnected();
 
             emit channelUpdated();

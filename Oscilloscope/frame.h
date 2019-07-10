@@ -5,7 +5,7 @@
 
 #include <QString>
 #include <QVector>
-#include <QVariant>
+#include <complex>
 
 namespace oscilloscope {
     struct Frame {
@@ -28,7 +28,7 @@ namespace oscilloscope {
 
         quint8 _pointSize;
 
-        QVector <double> _points;
+        QVector<std::complex<double>> _points;
     };
 }
 

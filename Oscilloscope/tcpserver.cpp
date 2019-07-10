@@ -2,8 +2,6 @@
 
 #include <QDataStream>
 
-#include <QDebug>
-
 namespace oscilloscope {
     TcpServer::TcpServer(quint16 port, QObject* parent) : Server(port, parent) {
         _server = new QTcpServer(this);
@@ -26,6 +24,13 @@ namespace oscilloscope {
         QTcpSocket *socket = _server->nextPendingConnection();
 
         TcpClient *client = new TcpClient(socket, this);
-        connect(client, SIGNAL(frameIsRead(Frame*)), this, SIGNAL(frame(Frame*)));
+        connect(client, SIGNAL(readyRead(TcpClient *)), this, SLOT(receiveData(TcpClient *)));
+    }
+
+    void TcpServer::receiveData(TcpClient *client) {
+        Frame *newFrame = client->read();
+
+        if (newFrame != nullptr)
+            emit frame(newFrame);
     }
 }

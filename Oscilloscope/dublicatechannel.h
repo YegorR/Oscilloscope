@@ -5,6 +5,7 @@
 
 #define DUBLICATE_NAME(index, name) "D " + QString::number(index) + " (" + name + ")"
 #define DUBLICATE_NAME_BY_PARENT(name) "(" + name + ")"
+#define DEF_DUBLICATE_NAME "Неопознанный дубликат"
 
 #include "ichannel.h"
 #include "channel.h"
