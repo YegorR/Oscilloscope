@@ -3,6 +3,7 @@
 #include "channel.h"
 #include "datastream.h"
 #include "tcpserver.h"
+#include "udpserver.h"
 
 #include <QDebug>
 
@@ -10,10 +11,9 @@ namespace oscilloscope {
     /// СОЗДАНИЕ КОНТРОЛЛЕРА КАНАЛОВ, ОТСЛЕЖИВАЮЩЕГО ПОЛУЧЕНИЕ НОВЫХ ДАННЫХ
 
     ChannelController::ChannelController(GlobalChannelList *channels) {
-        _tcpServer = nullptr;
         _globalChannelList = channels;
-
-        createTcpServer(8080);   
+        createTcpServer(8080);
+        createUdpServer(8080);
     }
 
     /// СОЗДАНИЕ ТСП СЕРВЕРА
@@ -30,6 +30,22 @@ namespace oscilloscope {
         connect(_tcpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
 
         return _tcpServer->start();
+    }
+
+    /// СОЗДАНИЕ УДП СЕРВЕРА
+
+    bool ChannelController::createUdpServer(quint16 port) {
+        if (_udpServer != nullptr) {
+            _udpServer->stop();
+            _udpServer->disconnect();
+
+            delete _udpServer;
+        }
+
+        _udpServer = new UdpServer(port, this);
+        connect(_udpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
+
+        return _udpServer->start();
     }
 
     /// ПРИНЯТИЕ КАДРА ДАННЫХ
