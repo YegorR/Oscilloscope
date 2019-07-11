@@ -45,7 +45,9 @@ SOURCES += \
     kiss_fft.cpp \
     signalsmoothing.cpp \
     display.cpp \
-    trigger.cpp
+    trigger.cpp \
+    udpserver.cpp
+
 
 HEADERS += \
         mainwindow.h \
@@ -72,7 +74,8 @@ HEADERS += \
     signalsmoothing.h \
     enums.h \
     display.h \
-    trigger.h
+    trigger.h \
+    udpserver.h
 
 FORMS += \
         mainwindow.ui \

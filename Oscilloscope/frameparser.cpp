@@ -11,10 +11,6 @@ namespace oscilloscope {
 
     template<typename T> void readPoints(QDataStream &, uint, QVector<std::complex<double>> &, bool complex = false);
 
-    /// КОНСТРУКТОР
-
-    FrameParser::FrameParser() {}
-
     /// ПАРСИНГ ПОЛУЧЕННЫХ ДАННЫХ
 
     Frame *FrameParser::parse(QByteArray &data) {
