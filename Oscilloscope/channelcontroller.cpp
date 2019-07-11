@@ -6,14 +6,19 @@
 #include "udpserver.h"
 
 #include <QDebug>
+#include <QSettings>
 
 namespace oscilloscope {
     /// СОЗДАНИЕ КОНТРОЛЛЕРА КАНАЛОВ, ОТСЛЕЖИВАЮЩЕГО ПОЛУЧЕНИЕ НОВЫХ ДАННЫХ
 
     ChannelController::ChannelController(GlobalChannelList *channels) {
         _globalChannelList = channels;
-        createTcpServer(8080);
-        createUdpServer(8080);
+
+        QSettings settings;
+        settings.beginGroup("server");
+        createTcpServer(static_cast<quint16>(settings.value("tcp", 8080).toUInt()));
+        createUdpServer(static_cast<quint16>(settings.value("udp", 8080).toUInt()));
+        settings.endGroup();
     }
 
     /// СОЗДАНИЕ ТСП СЕРВЕРА
