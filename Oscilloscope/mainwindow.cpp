@@ -100,6 +100,8 @@ namespace oscilloscope {
 
     void MainWindow::changeServerSettings() {
       ServerSettingsDialog dialog(this);
+      connect(&dialog, SIGNAL(tcpPortChanged()), _channelController, SLOT(reloadTcpServer()));
+      connect(&dialog, SIGNAL(udpPortChanged()), _channelController, SLOT(reloadUdpServer()));
       dialog.exec();
     }
 

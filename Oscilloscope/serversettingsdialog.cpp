@@ -11,10 +11,13 @@ namespace oscilloscope {
 
     _udpLabel = new QLabel("UDP порт", this);
     _tcpLabel = new QLabel("TCP порт", this);
+
      QSettings settings;
      settings.beginGroup("server");
-    _udpLine = new QLineEdit(settings.value("ucp", 8080).toString(), this);
-    _tcpLine = new QLineEdit(settings.value("tcp", 8080).toString(), this);
+     _udpPort = static_cast<quint16>(settings.value("udp","8080").toUInt());
+     _tcpPort = static_cast<quint16>(settings.value("tcp","8080").toUInt());
+    _udpLine = new QLineEdit(QString::number(_udpPort), this);
+    _tcpLine = new QLineEdit(QString::number(_tcpPort), this);
      settings.endGroup();
 
      _portValidator = new QIntValidator(this);
@@ -47,12 +50,18 @@ namespace oscilloscope {
   void ServerSettingsDialog::clickOk() {
     QSettings settings;
     settings.beginGroup("server");
-    settings.setValue("udp", _udpLine->text().toUInt());
-    settings.setValue("tcp", _tcpLine->text().toUInt());
+
+    quint16 newUdpPort = static_cast<quint16>(_udpLine->text().toUInt());
+    quint16 newTcpPort = static_cast<quint16>(_tcpLine->text().toUInt());
+    if (_udpPort != newUdpPort) {
+        settings.setValue("udp", newUdpPort);
+        emit udpPortChanged();
+      }
+    if (_tcpPort != newTcpPort) {
+        settings.setValue("tcp", newTcpPort);
+        emit tcpPortChanged();
+      }
     settings.endGroup();
-    QMessageBox msgBox;
-    msgBox.setText("Изменения вступят в силу после перезагрузки приложения");
-    msgBox.exec();
     this->close();
   }
 

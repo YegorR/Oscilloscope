@@ -26,9 +26,15 @@ namespace oscilloscope {
       QPushButton *_okButton;
       QPushButton *_cancelButton;
       QIntValidator *_portValidator;
+
+      quint16 _udpPort;
+      quint16 _tcpPort;
     private slots:
       void clickOk();
       void clickCancel();
+    signals:
+      void tcpPortChanged();
+      void udpPortChanged();
   };
 }
 #endif // SERVERSETTINGSDIALOG_H

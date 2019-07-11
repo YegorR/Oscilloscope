@@ -14,11 +14,8 @@ namespace oscilloscope {
     ChannelController::ChannelController(GlobalChannelList *channels) {
         _globalChannelList = channels;
 
-        QSettings settings;
-        settings.beginGroup("server");
-        createTcpServer(static_cast<quint16>(settings.value("tcp", 8080).toUInt()));
-        createUdpServer(static_cast<quint16>(settings.value("udp", 8080).toUInt()));
-        settings.endGroup();
+        reloadTcpServer();
+        reloadUdpServer();
     }
 
     /// СОЗДАНИЕ ТСП СЕРВЕРА
@@ -51,6 +48,25 @@ namespace oscilloscope {
         connect(_udpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
 
         return _udpServer->start();
+    }
+
+    /// ПЕРЕЗАГРУКА ТСП СЕРВЕРА
+
+    void ChannelController::reloadTcpServer() {
+
+      QSettings settings;
+      settings.beginGroup("server");
+      createTcpServer(static_cast<quint16>(settings.value("tcp", 8080).toUInt()));
+      settings.endGroup();
+    }
+
+    /// ПЕРЕЗАГРУЗКА УДП СЕРВЕРА
+
+    void ChannelController::reloadUdpServer() {
+      QSettings settings;
+      settings.beginGroup("server");
+      createUdpServer(static_cast<quint16>(settings.value("udp", 8080).toUInt()));
+      settings.endGroup();
     }
 
     /// ПРИНЯТИЕ КАДРА ДАННЫХ
