@@ -14,6 +14,8 @@ namespace oscilloscope {
     UdpServer(quint16 port, QObject *parent = nullptr);
     bool start();
     void stop();
+  private slots:
+    void read();
   };
 }
 
