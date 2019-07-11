@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    serversettingsdialog.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
@@ -51,6 +52,7 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+    serversettingsdialog.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
