@@ -6,6 +6,7 @@
 #include <QMainWindow>
 #include <QList>
 #include <QtGui>
+#include <QCoreApplication>
 
 #include "simplescope.h"
 #include "globalchannellist.h"
@@ -39,6 +40,8 @@ namespace oscilloscope {
         ChannelController *_channelController;
 
         int countScopes;
+
+        void initSettings();
     };
 }
 

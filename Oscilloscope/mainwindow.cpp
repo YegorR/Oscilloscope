@@ -7,6 +7,8 @@ namespace oscilloscope {
     /// СОЗДАНИЕ ГЛАВНОГО ОКНА И ПОРАЖДЕНИЕ ДРУГИХ
 
     MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+        initSettings();
+
         ui = new Ui::MainWindow;
         ui->setupUi(this);
 
@@ -75,6 +77,14 @@ namespace oscilloscope {
 
             scope->displayUpdate();
         }
+    }
+
+    // Инициализация настроек
+
+    void MainWindow::initSettings() {
+      QCoreApplication::setApplicationName("Oscilloscope");
+      QCoreApplication::setOrganizationDomain("tomsk.lemz.ru");
+      QCoreApplication::setOrganizationName("LEMZ-T");
     }
 
     /// ДЕСТРУКТОР
