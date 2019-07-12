@@ -3,17 +3,19 @@
 #include "channel.h"
 #include "datastream.h"
 #include "tcpserver.h"
+#include "udpserver.h"
 
 #include <QDebug>
+#include <QSettings>
 
 namespace oscilloscope {
     /// СОЗДАНИЕ КОНТРОЛЛЕРА КАНАЛОВ, ОТСЛЕЖИВАЮЩЕГО ПОЛУЧЕНИЕ НОВЫХ ДАННЫХ
 
     ChannelController::ChannelController(GlobalChannelList *channels) {
-        _tcpServer = nullptr;
         _globalChannelList = channels;
 
-        createTcpServer(8080);   
+        reloadTcpServer();
+        reloadUdpServer();
     }
 
     /// СОЗДАНИЕ ТСП СЕРВЕРА
@@ -30,6 +32,41 @@ namespace oscilloscope {
         connect(_tcpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
 
         return _tcpServer->start();
+    }
+
+    /// СОЗДАНИЕ УДП СЕРВЕРА
+
+    bool ChannelController::createUdpServer(quint16 port) {
+        if (_udpServer != nullptr) {
+            _udpServer->stop();
+            _udpServer->disconnect();
+
+            delete _udpServer;
+        }
+
+        _udpServer = new UdpServer(port, this);
+        connect(_udpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
+
+        return _udpServer->start();
+    }
+
+    /// ПЕРЕЗАГРУКА ТСП СЕРВЕРА
+
+    void ChannelController::reloadTcpServer() {
+
+      QSettings settings;
+      settings.beginGroup("server");
+      createTcpServer(static_cast<quint16>(settings.value("tcp", 8080).toUInt()));
+      settings.endGroup();
+    }
+
+    /// ПЕРЕЗАГРУЗКА УДП СЕРВЕРА
+
+    void ChannelController::reloadUdpServer() {
+      QSettings settings;
+      settings.beginGroup("server");
+      createUdpServer(static_cast<quint16>(settings.value("udp", 8080).toUInt()));
+      settings.endGroup();
     }
 
     /// ПРИНЯТИЕ КАДРА ДАННЫХ

@@ -7,6 +7,9 @@ namespace oscilloscope {
     /// СОЗДАНИЕ ГЛАВНОГО ОКНА И ПОРАЖДЕНИЕ ДРУГИХ
 
     MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
+        initSettings();
+        createMenus();
+
         ui = new Ui::MainWindow;
         ui->setupUi(this);
 
@@ -75,6 +78,31 @@ namespace oscilloscope {
 
             scope->displayUpdate();
         }
+    }
+
+    /// ИНИЦИАЛИЗАЦИЯ НАСТРОЕК
+
+    void MainWindow::initSettings() {
+      QCoreApplication::setApplicationName("Oscilloscope");
+      QCoreApplication::setOrganizationDomain("tomsk.lemz.ru");
+      QCoreApplication::setOrganizationName("LEMZ-T");
+    }
+
+    /// СОЗДАНИЕ МЕНЮ
+
+    void MainWindow::createMenus() {
+      _menu = menuBar()->addMenu("Осциллограф");
+
+      _serverAct = new QAction("Параметры сервера", this);
+      connect(_serverAct, SIGNAL(triggered()), this, SLOT(changeServerSettings()));
+      _menu->addAction(_serverAct);
+    }
+
+    void MainWindow::changeServerSettings() {
+      ServerSettingsDialog dialog(this);
+      connect(&dialog, SIGNAL(tcpPortChanged()), _channelController, SLOT(reloadTcpServer()));
+      connect(&dialog, SIGNAL(udpPortChanged()), _channelController, SLOT(reloadUdpServer()));
+      dialog.exec();
     }
 
     /// ДЕСТРУКТОР

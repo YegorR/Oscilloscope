@@ -14,13 +14,17 @@ namespace oscilloscope {
       Q_OBJECT
 
     private:
-        Server *_tcpServer;
-
+        Server *_tcpServer = nullptr;
+        Server *_udpServer = nullptr;
         GlobalChannelList *_globalChannelList;
+        bool createTcpServer(quint16 port);
+        bool createUdpServer(quint16 port);
 
     public:
         explicit ChannelController(GlobalChannelList *channels);
-        bool createTcpServer(quint16 port);
+    public slots:
+        void reloadTcpServer();
+        void reloadUdpServer();
 
     private slots:
         void receiveFrame(Frame *);

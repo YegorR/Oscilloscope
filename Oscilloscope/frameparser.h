@@ -6,8 +6,7 @@
 namespace oscilloscope {
     class FrameParser {
     public:
-        FrameParser();
-        Frame *parse(QByteArray &data);
+        static Frame *parse(QByteArray &data);
     };
 }
 
