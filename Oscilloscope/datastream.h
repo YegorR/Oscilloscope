@@ -8,7 +8,7 @@
 #include "frame.h"
 
 namespace oscilloscope {
-    class DataStream : QObject {
+    class DataStream : public QObject {
         Q_OBJECT
 
         private:
@@ -25,6 +25,7 @@ namespace oscilloscope {
 
         signals:
             void update();
+            void receivedFrame(Frame* frame);
     };
 }
 
