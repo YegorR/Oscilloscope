@@ -60,7 +60,7 @@ namespace oscilloscope {
         stream << frame->_divXValue;
         stream << frame->_divYValue;
         stream << static_cast<quint32>(frame->_points.size());
-        stream << static_cast<quint32>(frame->_offsetX.at(0));
+        stream << static_cast<qint32>(frame->_offsetX.at(0));
         stream << frame->_time;
         frame->_isComplex ? stream << static_cast<quint8>(1) : stream << static_cast<quint8>(0);
 

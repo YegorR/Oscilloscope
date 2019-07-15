@@ -7,10 +7,6 @@
 #include <QDebug>
 
 namespace oscilloscope {
-    QString readString(QDataStream &);
-
-    template<typename T> void readPoints(QDataStream &, uint, QVector<std::complex<double>> &, bool complex = false);
-
     /// ПАРСИНГ ПОЛУЧЕННЫХ ДАННЫХ
 
     Frame *FrameParser::parse(QByteArray &data) {
@@ -44,7 +40,7 @@ namespace oscilloscope {
         quint32 N;
         stream >> N;
 
-        quint32 offsetX;
+        qint32 offsetX;
         stream >> offsetX;
         frame->_offsetX.push_back(offsetX * frame->_divXValue);
 
@@ -90,7 +86,7 @@ namespace oscilloscope {
 
     /// СЧИТЫВАНИЕ ФОРМАТА STRING ИЗ ПОТОКА
 
-    QString readString(QDataStream &stream) {
+    QString FrameParser::readString(QDataStream &stream) {
         quint8 strSize;
         stream >> strSize;
 
@@ -118,7 +114,7 @@ namespace oscilloscope {
     /// СЧИТЫВАНИЕ ТОЧЕК
 
     template<typename T>
-    void readPoints(QDataStream &stream, uint N, QVector<std::complex<double>> &points, bool complex) {
+    void FrameParser::readPoints(QDataStream &stream, uint N, QVector<std::complex<double>> &points, bool complex) {
         if (complex) {
             T realPoint;
             T imagPoint;
