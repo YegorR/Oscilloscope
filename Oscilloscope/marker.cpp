@@ -3,7 +3,7 @@
 namespace oscilloscope {
     Marker::Marker(QChart *graph, const double &x){
         _graph = graph;
-        _markerCoordinatesX = x;
+        _x = x;
 
         QLogValueAxis *rangeY = static_cast<QLogValueAxis*>(_graph->axisY());
         _series = new QLineSeries();
@@ -17,12 +17,12 @@ namespace oscilloscope {
         _series->attachAxis(_graph->axisY());
     }
 
-    double Marker::getAnchor() {
-        return _markerCoordinatesX;
+    double Marker::anchor() {
+        return _x;
     }
 
     void Marker::setAnchor(const double &x) {
-        _markerCoordinatesX = x;
+        _x = x;
         QLogValueAxis *rangeY = static_cast<QLogValueAxis*>(_graph->axisY());
         _series->replace(0, x, rangeY->min());
         _series->replace(1, x, rangeY->max());
@@ -40,8 +40,12 @@ namespace oscilloscope {
         _series->setPen(pen);
     }
 
+    void Marker::hide() {
+        _series->hide();
+    }
+
     Marker::~Marker() {
         _series->clear();
-        delete [] _series;
+        delete _series;
     }
 }

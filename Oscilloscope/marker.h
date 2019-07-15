@@ -10,15 +10,17 @@ namespace oscilloscope {
         explicit Marker(QChart *graph, const double &x);
         ~Marker();
 
-        double getAnchor();
+        double anchor();
         void setAnchor(const double &x);
+
+        void hide();
 
     private:
         void paintMarker(const int &lambda);
 
         QChart *_graph;
         QLineSeries *_series;
-        double _markerCoordinatesX;
+        double _x;
     };
 }
 

@@ -28,7 +28,7 @@ namespace oscilloscope {
                                                              QList<Marker*> _displayMarkers);
 
         // Поиск экстремумов
-        const QVector<std::complex<double>> minAndMax (const QVector<double> offsetX, const QVector<std::complex<double>> &data,
+        const QVector<QPointF*> minAndMax (const QVector<double> offsetX, const QVector<std::complex<double>> &data,
                                                        QList<Marker*> _displayMarkers);
     };
 }

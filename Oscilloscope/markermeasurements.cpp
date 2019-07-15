@@ -115,44 +115,67 @@ namespace oscilloscope {
     }
 
     // Поиск экстремумов
-    const QVector<std::complex<double>> MarkerMeasurements::minAndMax (const QVector<double> offsetX,
+    const QVector<QPointF*> MarkerMeasurements::minAndMax (const QVector<double> offsetX,
                                                                        const QVector<std::complex<double>> &data,
                                                                        QList<Marker*> _displayMarkers) {
         double firstMarker = _displayMarkers[0]->getAnchor(), secondMarker = _displayMarkers[1]->getAnchor();
-        QVector <std::complex<double>> minMaxY;
-        minMaxY[0].real(9223372036854775807.0);
-        minMaxY[0].imag(9223372036854775807.0);
-        minMaxY[1].real(-9223372036854775808.0);
-        minMaxY[1].imag(-9223372036854775808.0);
+
+        QVector<QPointF *> point(4);
+
+        point.at(0)->setX(-1);
+        point.at(1)->setX(-1);
+        point.at(2)->setX(-1);
+        point.at(3)->setX(-1);
+
+        point.at(0)->setY(9223372036854775807.0);
+        point.at(1)->setY(9223372036854775807.0);
+        point.at(2)->setY(-9223372036854775808.0);
+        point.at(3)->setY(-9223372036854775808.0);
 
         if (firstMarker < secondMarker) {
             for (int i = 0; i < offsetX.size(); i++) {
                 if ((firstMarker <= offsetX[i]) && (offsetX[i] <= secondMarker)) {
-                    if (minMaxY[0].real() > data[i].real())
-                        minMaxY[0].real(data[i].real());
-                    if (minMaxY[0].imag() > data[i].imag())
-                        minMaxY[0].imag(data[i].imag());
-                    if (minMaxY[1].real() < data[i].real())
-                        minMaxY[1].real(data[i].real());
-                    if (minMaxY[1].imag() < data[i].imag())
-                        minMaxY[1].imag(data[i].imag());
+                    if (point.at(0)->y() > data[i].real()) {
+                        point.at(0)->setY(data[i].real());
+                        point.at(0)->setX(offsetX[i]);
+                    }
+                    if (point.at(1)->y() > data[i].imag()) {
+                        point.at(1)->setY(data[i].imag());
+                        point.at(1)->setX(offsetX[i]);
+                    }
+                    if (point.at(2)->y() < data[i].real()) {
+                        point.at(2)->setY(data[i].real());
+                        point.at(2)->setX(offsetX[i]);
+                    }
+                    if (point.at(3)->y() < data[i].imag()) {
+                        point.at(3)->setY(data[i].imag());
+                        point.at(3)->setX(offsetX[i]);
+                    }
                 }
             }
         } else {
             for (int i = 0; i < offsetX.size(); i++) {
                 if ((secondMarker <= offsetX[i]) && (offsetX[i] <= firstMarker)) {
-                    if (minMaxY[0].real() > data[i].real())
-                        minMaxY[0].real(data[i].real());
-                    if (minMaxY[0].imag() > data[i].imag())
-                        minMaxY[0].imag(data[i].imag());
-                    if (minMaxY[1].real() < data[i].real())
-                        minMaxY[1].real(data[i].real());
-                    if (minMaxY[1].imag() < data[i].imag())
-                        minMaxY[1].imag(data[i].imag());
+                    if (point.at(0)->y() > data[i].real()) {
+                        point.at(0)->setY(data[i].real());
+                        point.at(0)->setX(offsetX[i]);
+                    }
+                    if (point.at(1)->y() > data[i].imag()) {
+                        point.at(1)->setY(data[i].imag());
+                        point.at(1)->setX(offsetX[i]);
+                    }
+                    if (point.at(2)->y() < data[i].real()) {
+                        point.at(2)->setY(data[i].real());
+                        point.at(2)->setX(offsetX[i]);
+                    }
+                    if (point.at(3)->y() < data[i].imag()) {
+                        point.at(3)->setY(data[i].imag());
+                        point.at(3)->setX(offsetX[i]);
+                    }
                 }
             }
         }
 
-        return minMaxY;
+        return point;
     }
 }
