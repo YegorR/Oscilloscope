@@ -28,8 +28,14 @@ namespace oscilloscope {
         }
 
         std::complex<double> result;
-        result.real(realY/count);
-        result.imag(imagY/count);
+
+        if (count != 0) {
+            result.real(realY / (double)count);
+            result.imag(imagY / (double)count);
+        } else {
+            result.real(0);
+            result.imag(0);
+        }
         return result;
     }
 
@@ -61,8 +67,14 @@ namespace oscilloscope {
         }
 
         std::complex<double> result;
-        result.real(sqrt((1 - (count - 1)) * realY));
-        result.imag(sqrt((1 - (count - 1)) * imagY));
+
+        if (count > 1) {
+            result.real(sqrt((1.0 - ((double)count - 1.0)) * realY));
+            result.imag(sqrt((1.0 - ((double)count - 1.0)) * imagY));
+        } else {
+            result.real(0);
+            result.imag(0);
+        }
         return result;
     }
 
@@ -97,8 +109,13 @@ namespace oscilloscope {
         }
 
         std::complex<double> result;
-        result.real((1 / (end - begin)) * sumRealY);
-        result.imag((1 / (end - begin)) * sumImagY);
+        if ((end-begin) != 0.0) {
+            result.real((1.0 / (end - begin)) * sumRealY);
+            result.imag((1.0 / (end - begin)) * sumImagY);
+        } else {
+            result.real(0);
+            result.imag(0);
+        }
         return result;
     }
 
