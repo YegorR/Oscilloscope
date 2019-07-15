@@ -20,16 +20,17 @@ namespace oscilloscope {
         Q_OBJECT
 
     public:
-        explicit MainWindow(QWidget *parent = 0);     
+        explicit MainWindow(QWidget *parent = nullptr);
 
         ~MainWindow();
 
     private slots:
-        void on_createSimpleScope_pressed();
         void deleteScope();
 
         void channelDelete(const QString name);
         void channelUpdate();
+
+        void on_createSimpleScope_clicked();
 
     private:
         Ui::MainWindow *ui;

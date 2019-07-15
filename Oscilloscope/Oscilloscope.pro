@@ -25,6 +25,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    marker.cpp \
+    markermeasurements.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
@@ -48,6 +50,8 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+    marker.h \
+    markermeasurements.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \

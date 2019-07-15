@@ -43,6 +43,12 @@
       <property name="text">
        <string>Новый дисплей</string>
       </property>
+      <property name="autoRepeat">
+       <bool>false</bool>
+      </property>
+      <property name="autoRepeatDelay">
+       <number>300</number>
+      </property>
      </widget>
     </item>
     <item row="0" column="0">

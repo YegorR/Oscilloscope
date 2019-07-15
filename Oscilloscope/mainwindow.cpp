@@ -22,7 +22,7 @@ namespace oscilloscope {
 
         countScopes = 1;
 
-        on_createSimpleScope_pressed();
+        on_createSimpleScope_clicked();
 
         setAttribute(Qt::WA_DeleteOnClose, true);
     }
@@ -41,8 +41,10 @@ namespace oscilloscope {
 
     /// НАЖАТИЕ КНОПКИ - СОЗДАНИЕ НОВОГО ДИСПЛЕЯ
 
-    void MainWindow::on_createSimpleScope_pressed() {
-        SimpleScope *scope = new SimpleScope(0, "Дисплей " + QString::number(countScopes), _channels);
+
+    void oscilloscope::MainWindow::on_createSimpleScope_clicked()
+    {
+        SimpleScope *scope = new SimpleScope(nullptr, "Дисплей " + QString::number(countScopes), _channels);
         scope->show();
         scope->move(this->x() + this->width() + (30 + 10 * _scopes.length()), this->y() - (80 + 10 * _scopes.length()));
 
@@ -84,8 +86,13 @@ namespace oscilloscope {
         delete _channels;
         delete _channelController;
 
-        for (int i = 0; i < _scopes.length(); i++)
+        qDebug() << "size " << _scopes.length();
+        for (int i = 0; i < _scopes.length(); i++) {
+            qDebug() << "Размер до делета " <<_scopes.length();
             delete _scopes.at(i);
+            qDebug() << "i " << i;
+            qDebug() << "После " <<_scopes.length();
+        }
 
         _scopes.clear();
     }

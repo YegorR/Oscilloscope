@@ -11,28 +11,36 @@ namespace oscilloscope {
         this->setRenderHint(QPainter::Antialiasing);
 
         QValueAxis *xAxis = new QValueAxis();
-        xAxis->setRange(0, 100);
+        xAxis->setRange(-50, 50);
+        _minX = xAxis->min();
+        _maxX = xAxis->max();
 
         QValueAxis *yAxis = new QValueAxis();
-        yAxis->setRange(-10, 10);
+        yAxis->setRange(0, 20);
+        _minY = yAxis->min();
+        _maxY = yAxis->max();
 
         _graph->addAxis(xAxis, Qt::AlignBottom);
         _graph->addAxis(yAxis, Qt::AlignLeft);
 
+        createMarker(_minX);
+        createMarker(_maxX);
+
         _mouseGrab = false;
-
-        _maxX = 100;
-
-        _minY = -10;
-        _maxY = 10;
     }
 
     void Display::mousePressEvent(QMouseEvent *event) {
-        _startX = event->globalX();
-        _startY = event->globalY();
+        _startX = event->x() - _graph->plotArea().x();
+        _startY = event->y() - _graph->plotArea().y();
 
         _mouseGrab = true;
-
+        QPointF mousePoint;
+        mousePoint.setX(((_startX * (_maxX - _minX)) / _graph->plotArea().width()) + _minX);
+        mousePoint.setY(_maxY - (((_startY * (_maxY - _minY)) / _graph->plotArea().height()) + _minY) - ((_maxY - _minY) / 2) + ((_maxY + _minY) / 2));
+        if ((_minY <= mousePoint.y()) && (_maxY >= mousePoint.y()) && (_minX <= mousePoint.x()) && (_maxX >= mousePoint.x())) {
+            event->setLocalPos(mousePoint);
+            moveMarker(event);
+        }
         event->accept();
         QChartView::mousePressEvent(event);
     }
@@ -155,6 +163,16 @@ namespace oscilloscope {
         series->attachAxis(_graph->axisY());
     }
 
+    void Display::createMarker(const double &x) {
+        Marker *marker = new Marker(_graph, x);
+        _dispalyMarkers << marker;
+    }
+
+    void Display::moveMarker(QMouseEvent *event) {
+        _dispalyMarkers[0]->setAnchor(event->localPos().x());
+        _dispalyMarkers.swapItemsAt(0,1);
+    }
+
     void Display::setMaxX(double max) {
         if (_maxX > max) _graph->axisX()->setMax(max);
 
@@ -169,6 +187,13 @@ namespace oscilloscope {
         _maxY = max;
     }
 
-    Display::~Display() {}
+    Display::~Display() {
+        if (_dispalyMarkers.empty()) {
+            for (int i = 0; i < _dispalyMarkers.size(); i++) {
+                delete[] _dispalyMarkers[i];
+            }
+            _dispalyMarkers.clear();
+        }
+    }
 }
 

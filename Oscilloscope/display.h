@@ -4,6 +4,8 @@
 #include <QtCharts/QtCharts>
 QT_CHARTS_USE_NAMESPACE
 
+#include "marker.h"
+
 namespace oscilloscope {
     class Display : public QChartView {
         Q_OBJECT
@@ -13,7 +15,11 @@ namespace oscilloscope {
 
         bool _mouseGrab;
         double _startX, _startY;
-        double _maxX, _minY, _maxY;
+        double _minX, _maxX, _minY, _maxY;
+        QList <Marker*> _dispalyMarkers;
+
+        void createMarker(const double &x);
+        void moveMarker(QMouseEvent *event);
 
     protected:
         void mousePressEvent(QMouseEvent *event);
@@ -33,6 +39,8 @@ namespace oscilloscope {
 
        ~Display();
 
+    signals:
+        void mousePress(QMouseEvent *event);
     };
 }
 

@@ -322,6 +322,7 @@ namespace oscilloscope {
             _channels->add(dublicate);
         }
 
+        this->disconnect();
     }
 
     /// ДЕСТРУКТОР

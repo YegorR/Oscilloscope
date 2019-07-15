@@ -40,6 +40,7 @@ namespace oscilloscope {
         LocalChannelList *_channels;
 
         Display *_display;
+
     protected:
         void paintEvent(QPaintEvent *);
 
