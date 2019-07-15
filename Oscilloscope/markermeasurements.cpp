@@ -5,7 +5,7 @@ namespace oscilloscope {
     const std::complex<double> MarkerMeasurements::expectedValue(const QVector<double> offsetX,
                                                                           const QVector<std::complex<double>> &data,
                                                                           QList<Marker*> _displayMarkers) {
-        double firstMarker = _displayMarkers[0]->getAnchor(), secondMarker = _displayMarkers[1]->getAnchor();
+        double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
         double realY = 0.0, imagY = 0.0;
         int count = 0;
 
@@ -38,7 +38,7 @@ namespace oscilloscope {
                                                                               const QVector<std::complex<double>> &data,
                                                                               QList<Marker*> _displayMarkers) {
         std::complex<double> measur = expectedValue(offsetX, data, _displayMarkers);
-        double firstMarker = _displayMarkers[0]->getAnchor(), secondMarker = _displayMarkers[1]->getAnchor();
+        double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
         double realY = 0.0, imagY = 0.0;
         int count = 0;
 
@@ -70,7 +70,7 @@ namespace oscilloscope {
     const std::complex<double> MarkerMeasurements::signalCapacity  (const QVector<double> offsetX,
                                                                              const QVector<std::complex<double>> &data,
                                                                              QList<Marker*> _displayMarkers) {
-        double firstMarker = _displayMarkers[0]->getAnchor(), secondMarker = _displayMarkers[1]->getAnchor();
+        double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
         double sumRealY = 0.0, sumImagY = 0.0;
         double begin = 0.0, end = 0.0;
 
@@ -106,11 +106,11 @@ namespace oscilloscope {
     const std::complex<double> MarkerMeasurements::signalAmplitude (const QVector<double> offsetX,
                                                                              const QVector<std::complex<double>> &data,
                                                                              QList<Marker*> _displayMarkers) {
-        QVector<std::complex<double>> minMaxValueY = minAndMax(offsetX, data, _displayMarkers);
+        QVector<QPointF*> point = minAndMax(offsetX, data, _displayMarkers);
 
         std::complex<double> result;
-        result.real(abs(minMaxValueY[0].real() - minMaxValueY[1].real()) / 2);
-        result.imag(abs(minMaxValueY[0].imag() - minMaxValueY[1].imag()) / 2);
+        result.real(abs(point.at(0)->y() - point.at(2)->y()) / 2);
+        result.imag(abs(point.at(1)->y() - point.at(3)->y()) / 2);
         return result;
     }
 
@@ -118,7 +118,7 @@ namespace oscilloscope {
     const QVector<QPointF*> MarkerMeasurements::minAndMax (const QVector<double> offsetX,
                                                                        const QVector<std::complex<double>> &data,
                                                                        QList<Marker*> _displayMarkers) {
-        double firstMarker = _displayMarkers[0]->getAnchor(), secondMarker = _displayMarkers[1]->getAnchor();
+        double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
 
         QVector<QPointF *> point(4);
 
