@@ -28,12 +28,16 @@ namespace oscilloscope {
                     _frame->_points.insert(j, frame->_points.at(k));
                 }
 
+                delete frame;
+
                 return;
             }
         }
 
         _frame->_offsetX.append(frame->_offsetX);
         _frame->_points.append(frame->_points);
+
+        delete frame;
     }
 
     /// ПОЛУЧЕНИЕ КАДРА

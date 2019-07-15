@@ -29,7 +29,7 @@ namespace oscilloscope {
         GlobalChannelListView *_channelsView;
 
     signals:
-        void channelUpdated();
+        void channelUpdated(QString name);
 
     };
 }

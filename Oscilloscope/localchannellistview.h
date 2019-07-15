@@ -47,7 +47,7 @@ namespace oscilloscope {
         void itemCheck();
 
     signals:
-        void itemChecked();
+        void itemChecked(QObject *);
     };
 }
 

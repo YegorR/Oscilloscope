@@ -31,10 +31,10 @@ namespace oscilloscope {
         int _countDublicates;
 
     private slots:
-        void itemCheck();
+        void itemCheck(QObject *);
 
     signals:
-        void itemChecked();
+        void itemChecked(QObject *);
     };
 }
 

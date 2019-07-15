@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+
     nanotimer.cpp \
     recorder.cpp \
     recordframeparser.cpp \
@@ -50,8 +51,8 @@ SOURCES += \
     signalsmoothing.cpp \
     display.cpp \
     trigger.cpp \
-    udpserver.cpp
-
+    udpserver.cpp \
+    serversettings.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -83,7 +84,8 @@ HEADERS += \
     enums.h \
     display.h \
     trigger.h \
-    udpserver.h
+    udpserver.h \
+    serversettings.h
 
 FORMS += \
         mainwindow.ui \
