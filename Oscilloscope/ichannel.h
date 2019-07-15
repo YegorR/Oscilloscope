@@ -21,6 +21,7 @@ namespace oscilloscope {
         DataStream *data() const;
         QVector <std::complex<double>> points() const;
 
+        void trigger(Enums::TriggersType type = Enums::TriggersType::WithoutTriggers, double level = 0.0);
         void transform(Enums::TransformateType type = Enums::TransformateType::None, double expSmthCoef = 0.0, int movingAvgCoef = 0);
 
         ~iChannel();
@@ -36,10 +37,18 @@ namespace oscilloscope {
         DataStream *_data;
     };
 
+    /// ПРЕОБРАЗОВАНИЯ
+
     QVector<std::complex<double>> bpf(const QVector<std::complex<double>> &points);
     QVector<std::complex<double>> threePointFilter(const QVector<std::complex<double>> &points);
     QVector<std::complex<double>> expSmoothing(const QVector<std::complex<double>> &points, double coef);
     QVector<std::complex<double>> movingAvg(const QVector<std::complex<double>> &points, int coef);
+
+    /// ТРИГГЕРЫ
+
+    QVector<std::complex<double>> triggerByForwardFront(const QVector<std::complex<double>> &points, double level);
+    QVector<std::complex<double>> triggerByBackFront(const QVector<std::complex<double>> &points, double level);
+    QVector<std::complex<double>> triggerByTime(const QVector<std::complex<double>> &points, double level, double step);
 }
 
 #endif

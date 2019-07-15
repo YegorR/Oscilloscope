@@ -3,6 +3,8 @@
 
 #include "dublicatechannel.h"
 
+#include <QDebug>
+
 namespace oscilloscope {
     /// Конструктор создания локального списка с указанием разменщения его View`ера
 
@@ -12,7 +14,7 @@ namespace oscilloscope {
         _channelsView = new LocalChannelListView();
 
         connect(_channelsView, SIGNAL(channelDeleted(const QString)), this, SLOT(channelDelete(const QString)));
-        connect(_channelsView, SIGNAL(itemChecked()), this, SLOT(itemCheck()));
+        connect(_channelsView, SIGNAL(itemChecked(QObject *)), this, SLOT(itemCheck(QObject *)));
 
         if (parent) parent->addWidget(_channelsView);
             else _channelsView->show();
@@ -46,15 +48,15 @@ namespace oscilloscope {
         return -1;
     }
 
-    void LocalChannelList::itemCheck() {
-        emit itemChecked();
+    void LocalChannelList::itemCheck(QObject *object) {
+        emit itemChecked(object);
     }
 
     /// Удаление дубликатов из списка по имени оригинального канала
 
     void LocalChannelList::dublicatesDelete(const QString nameParent) {
         for (int i = 0; i < _channels->size(); i++) {
-            if (_channels->at(i)->data()->frame()->_channelName.contains(nameParent, Qt::CaseInsensitive)) {
+            if (_channels->at(i)->data()->frame()->_channelName == nameParent) {
                 delete _channels->at(i);
                 _channels->removeAt(i--);
             }
@@ -63,7 +65,5 @@ namespace oscilloscope {
 
     /// Деструктор
 
-    LocalChannelList::~LocalChannelList() {
-        delete _channelsView;
-    }
+    LocalChannelList::~LocalChannelList() {}
 }

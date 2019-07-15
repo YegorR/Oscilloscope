@@ -20,7 +20,7 @@ namespace oscilloscope {
 
         _channelsView->repaint();
 
-        emit channelUpdated();
+        emit channelUpdated(channel->data()->frame()->_channelName);
     }
 
     /// ПОЛУЧЕНИЕ ИНДЕКСА ОРИГИНАЛЬНОГО КАНАЛА ПО ЕГО ИМЕНИ
@@ -45,7 +45,5 @@ namespace oscilloscope {
 
     /// ДЕСТРУКТОР
 
-    GlobalChannelList::~GlobalChannelList() {
-        delete _channelsView;
-    }
+    GlobalChannelList::~GlobalChannelList() {}
 }

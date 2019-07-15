@@ -5,6 +5,7 @@
 
 #include <QWidget>
 #include <QMetaEnum>
+#include <tuple>
 
 #include <QtCharts/QtCharts>
 QT_CHARTS_USE_NAMESPACE
@@ -40,14 +41,27 @@ namespace oscilloscope {
         LocalChannelList *_channels;
 
         Display *_display;
+
+        std::tuple<iChannel *, Attributes *, bool> findChannel(QString name);
+
     protected:
         void paintEvent(QPaintEvent *);
+        bool eventFilter(QObject *object, QEvent *event);
 
     private slots:
         void on_createDublicate_pressed();
 
     public slots:
-        void displayUpdate();
+        void channelUpdate(std::tuple<iChannel *, Attributes *, bool> _tuple, QString name);
+
+        void itemChecked(QObject *);
+
+        void recount(QString name);
+        void recountDublicates(QString name);
+
+        void deleteChannel(QString name);
+        void deleteDublicates(QString name);
+
     };
 }
 

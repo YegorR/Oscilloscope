@@ -5,6 +5,9 @@
 #include <QListWidgetItem>
 
 #include "localchannellistview.h"
+#include "dublicatechannel.h"
+
+#include <QDebug>
 
 namespace oscilloscope {
     /// СОЗДАНИЕ ЛОКАЛЬНОГО СПИСКА ОТОБРАЖЕНИЯ КАНАЛОВ И ИХ ДУБЛИКАТОВ
@@ -66,7 +69,7 @@ namespace oscilloscope {
 
         for (int i = 0; i < this->count(); i++) {
             item = dynamic_cast<QCheckBox *>(this->itemWidget(this->item(i)));
-            if (item->text().contains(name, Qt::CaseInsensitive)) return this->item(i);
+            if (item->text().contains(DUBLICATE_NAME_BY_PARENT(name), Qt::CaseInsensitive)) return this->item(i);
         }
 
         return 0;
@@ -89,13 +92,16 @@ namespace oscilloscope {
     /// ОБРАБОТКА СИГНАЛА О ИЗМЕНЕНИИ СОСТОЯНИЯ CHECKBOX`а
 
     void LocalChannelListView::itemCheck() {
-        emit itemChecked();
+        emit itemChecked(sender());
     }
 
     /// УДАЛЕНИЕ ОБЪЕКТА ИЗ СПИСКА ОТОБРАЖЕНИЯ
 
     void LocalChannelListView::itemDelete(QListWidgetItem *item) {
-        emit channelDeleted(item->text());
+        QCheckBox *channel = dynamic_cast<QCheckBox *>(itemWidget(item));
+
+        emit channelDeleted(channel->text());
+
         deleteAttribute(this->row(item));
         delete this->takeItem(this->row(item));
     }
@@ -104,8 +110,13 @@ namespace oscilloscope {
 
     void LocalChannelListView::deleteChannel(const QString name) {
         QListWidgetItem *item = this->itemByName(name);
-        deleteAttribute(this->row(item));
-        if (item) delete item;
+
+        if (item) {
+            deleteAttribute(this->row(item));
+            if (item) delete item;
+
+            emit channelDeleted(name);
+        }
     }
 
     /// УДАЛЕНИЕ ВСЕХ ДУБЛИКАТОВ ПО НАЗВАНИЮ ОРИГИНАЛА

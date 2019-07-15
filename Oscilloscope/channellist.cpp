@@ -1,5 +1,7 @@
 #include "channellist.h"
 
+#include <QDebug>
+
 namespace oscilloscope {
     /// Конструктор - создание списка каналов
 

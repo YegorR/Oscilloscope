@@ -6,6 +6,9 @@ namespace oscilloscope {
     DublicateChannel::DublicateChannel(const Channel *channel) : iChannel(channel) {
         _channelType = CH_DUBLICATE;
         _name = DEF_DUBLICATE_NAME;
+
+        trigger();
+        transform();
     }
 
     /// ПОЛУЧЕНИЕ ИМЕНИ ДУБЛИКАТА

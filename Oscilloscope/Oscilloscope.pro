@@ -25,7 +25,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    serversettingsdialog.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
@@ -47,12 +46,11 @@ SOURCES += \
     signalsmoothing.cpp \
     display.cpp \
     trigger.cpp \
-    udpserver.cpp
-
+    udpserver.cpp \
+    serversettings.cpp
 
 HEADERS += \
         mainwindow.h \
-    serversettingsdialog.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
@@ -77,7 +75,8 @@ HEADERS += \
     enums.h \
     display.h \
     trigger.h \
-    udpserver.h
+    udpserver.h \
+    serversettings.h
 
 FORMS += \
         mainwindow.ui \
