@@ -7,10 +7,10 @@ namespace oscilloscope {
                                                                           QList<Marker*> _displayMarkers) {
         double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
         double realY = 0.0, imagY = 0.0;
-        int count = 0;
+        double count = 0.0;
 
         if (firstMarker < secondMarker) {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((firstMarker <= offsetX[i]) && (offsetX[i] <= secondMarker)) {
                     realY += data[i].real();
                     imagY += data[i].imag();
@@ -18,7 +18,7 @@ namespace oscilloscope {
                 }
             }
         } else {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((secondMarker <= offsetX[i]) && (offsetX[i] <= firstMarker)) {
                     realY += data[i].real();
                     imagY += data[i].imag();
@@ -29,9 +29,9 @@ namespace oscilloscope {
 
         std::complex<double> result;
 
-        if (count != 0) {
-            result.real(realY / (double)count);
-            result.imag(imagY / (double)count);
+        if (count != 0.0) {
+            result.real(realY / count);
+            result.imag(imagY / count);
         } else {
             result.real(0);
             result.imag(0);
@@ -46,10 +46,10 @@ namespace oscilloscope {
         std::complex<double> measur = expectedValue(offsetX, data, _displayMarkers);
         double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
         double realY = 0.0, imagY = 0.0;
-        int count = 0;
+        double count = 0.0;
 
         if (firstMarker < secondMarker) {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((firstMarker <= offsetX[i]) && (offsetX[i] <= secondMarker)) {
                     realY = pow(data[i].real() - measur.real(), 2);
                     imagY = pow(data[i].imag() - measur.imag(), 2);
@@ -57,7 +57,7 @@ namespace oscilloscope {
                 }
             }
         } else {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((secondMarker <= offsetX[i]) && (offsetX[i] <= firstMarker)) {
                     realY = pow(data[i].real() - measur.real(), 2);
                     imagY = pow(data[i].imag() - measur.imag(), 2);
@@ -69,8 +69,8 @@ namespace oscilloscope {
         std::complex<double> result;
 
         if (count > 1) {
-            result.real(sqrt((1.0 - ((double)count - 1.0)) * realY));
-            result.imag(sqrt((1.0 - ((double)count - 1.0)) * imagY));
+            result.real(sqrt((1.0 - (count - 1.0)) * realY));
+            result.imag(sqrt((1.0 - (count - 1.0)) * imagY));
         } else {
             result.real(0);
             result.imag(0);
@@ -87,7 +87,7 @@ namespace oscilloscope {
         double begin = 0.0, end = 0.0;
 
         if (firstMarker < secondMarker) {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((firstMarker <= offsetX[i]) && (offsetX[i] <= secondMarker)) {
                     if (begin == 0.0)
                         begin = offsetX[i];
@@ -97,7 +97,7 @@ namespace oscilloscope {
                 }
             }
         } else {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((secondMarker <= offsetX[i]) && (offsetX[i] <= firstMarker)) {
                     if (begin == 0.0)
                         begin = offsetX[i];
@@ -131,13 +131,48 @@ namespace oscilloscope {
         return result;
     }
 
+    // Комплексная амплитуда
+    double complexAmplitude (const QVector<double> offsetX, const QVector<std::complex<double>> &data,
+                                                 QList<Marker*> _displayMarkers) {
+        double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
+        double sum = 0.0;
+        double count = 0.0;
+
+        if (firstMarker < secondMarker) {
+            for (int i = 0; i < data.size(); i++) {
+                if ((firstMarker <= offsetX[i]) && (offsetX[i] <= secondMarker)) {
+                    sum += sqrt(pow(data[i].real(), 2) + pow(data[i].imag(), 2));
+                    count++;
+                }
+            }
+        } else {
+            for (int i = 0; i < data.size(); i++) {
+                if ((secondMarker <= offsetX[i]) && (offsetX[i] <= firstMarker)) {
+                    sum += sqrt(pow(data[i].real(), 2) + pow(data[i].imag(), 2));
+                    count++;
+                }
+            }
+        }
+
+        if (count > 0.0) {
+            return (sum / count);
+        } else {
+            return 0;
+        }
+    }
+
     // Поиск экстремумов
     const QVector<QPointF*> MarkerMeasurements::minAndMax (const QVector<double> offsetX,
                                                                        const QVector<std::complex<double>> &data,
                                                                        QList<Marker*> _displayMarkers) {
         double firstMarker = _displayMarkers[0]->anchor(), secondMarker = _displayMarkers[1]->anchor();
 
-        QVector<QPointF *> point(4);
+        QVector<QPointF *> point;
+
+        for (int i = 0; i < 4; i++) {
+            QPointF *p;
+            point.append(p);
+        }
 
         point.at(0)->setX(-1);
         point.at(1)->setX(-1);
@@ -150,7 +185,7 @@ namespace oscilloscope {
         point.at(3)->setY(-9223372036854775808.0);
 
         if (firstMarker < secondMarker) {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((firstMarker <= offsetX[i]) && (offsetX[i] <= secondMarker)) {
                     if (point.at(0)->y() > data[i].real()) {
                         point.at(0)->setY(data[i].real());
@@ -171,7 +206,7 @@ namespace oscilloscope {
                 }
             }
         } else {
-            for (int i = 0; i < offsetX.size(); i++) {
+            for (int i = 0; i < data.size(); i++) {
                 if ((secondMarker <= offsetX[i]) && (offsetX[i] <= firstMarker)) {
                     if (point.at(0)->y() > data[i].real()) {
                         point.at(0)->setY(data[i].real());
