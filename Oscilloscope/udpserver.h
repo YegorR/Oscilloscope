@@ -5,18 +5,22 @@
 #include "server.h"
 
 namespace oscilloscope {
-  class UdpServer : public Server
-  {
-    Q_OBJECT
-  private:
-    QUdpSocket _socket;
-  public:
-    UdpServer(quint16 port, QObject *parent = nullptr);
-    bool start();
-    void stop();
-  private slots:
-    void read();
-  };
+    class UdpServer : public Server {
+        Q_OBJECT
+
+    private:
+        QUdpSocket _socket;
+
+    public:
+        UdpServer(quint16 port, QObject *parent = nullptr);
+
+        bool start();
+        void stop();
+
+    private slots:
+        void read();
+
+    };
 }
 
 #endif // UDPSERVER_H

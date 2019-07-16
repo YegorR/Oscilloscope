@@ -6,12 +6,10 @@
 #include <QMainWindow>
 #include <QList>
 #include <QtGui>
-#include <QCoreApplication>
 
 #include "simplescope.h"
 #include "globalchannellist.h"
 #include "channelcontroller.h"
-#include "serversettingsdialog.h"
 
 namespace Ui {
     class MainWindow;
@@ -31,7 +29,7 @@ namespace oscilloscope {
         void deleteScope();
 
         void channelDelete(const QString name);
-        void channelUpdate();
+        void channelUpdate(QString name);
 
         void changeServerSettings();
 
@@ -47,8 +45,9 @@ namespace oscilloscope {
 
         int countScopes;
 
-        void initSettings();
-        void createMenus();
+    protected:
+        bool eventFilter(QObject *object, QEvent *event);
+
     };
 }
 

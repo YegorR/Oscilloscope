@@ -37,7 +37,7 @@ namespace oscilloscope {
     }
 
     QVector<std::complex<double>> SignalSmoothing::movAverage(const QVector<std::complex<double>> &data, int order){
-        double sum1Re = 0, sum2Re = 0, sum1Im = 0, sum2Im;
+        double sum1Re = 0, sum2Re = 0, sum1Im = 0, sum2Im = 0;
 
         QVector<std::complex<double>> out;
         std::complex<double> buffer;

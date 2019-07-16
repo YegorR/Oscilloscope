@@ -10,10 +10,24 @@ namespace oscilloscope {
 
     private:
         QChart *_graph;
+        QAreaSeries *_zoomArea;
+
+        QLabel *_mouseCord;
+
+        QLineSeries *_target;
 
         bool _mouseGrab;
-        double _startX, _startY;
-        double _maxX, _minY, _maxY;
+        bool _targetMove;
+        bool _zoomRect;
+
+        bool _keyShift, _keyCtrl, _keyAlt;
+
+        double _startX, _startY, _endX, _endY;
+        double _minX, _maxX, _minY, _maxY;
+
+        void verticalZoom(bool up);
+        void horizontalZoom(bool up);
+        void zoomRect(double minX, double maxX, double minY, double maxY);
 
     protected:
         void mousePressEvent(QMouseEvent *event);
@@ -22,14 +36,18 @@ namespace oscilloscope {
 
         void wheelEvent(QWheelEvent *event);
 
+        void keyPressEvent(QKeyEvent *event);
+        void keyReleaseEvent(QKeyEvent *event);
+
     public:
         explicit Display();
 
         void clear();
-        void addGraph(QLineSeries *series);
+        void keysReset();
 
-        void setMaxX(double max);
-        void setMinMaxY(double min, double max);
+        void addGraph(QLineSeries *series);
+        void deleteGraph(QString name);
+        void deleteDublicatesGraph(QString name);
 
        ~Display();
 

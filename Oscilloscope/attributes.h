@@ -16,8 +16,14 @@ namespace oscilloscope {
 
         double _expSmthCoef;
         int _moveAvgCoef;
+        double _triggerLevel;
+
+        bool _showReal, _showImag;
+
+        int _startX, _startY;
 
         Enums::TransformateType _transformateType;
+        Enums::TriggersType _triggerType;
 
         Attributes();
     };

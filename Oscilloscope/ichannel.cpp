@@ -1,6 +1,8 @@
 #include "ichannel.h"
+
 #include "kiss_fft.h"
 #include "signalsmoothing.h"
+#include "trigger.h"
 
 #include <complex>
 
@@ -35,12 +37,18 @@ namespace oscilloscope {
 
     /// ПРЕОБРАЗОВАНИЕ ДАННЫХ В НУЖНЫЙ НАМ ВИД
 
-    void iChannel::transform(Enums::TransformateType type, double expSmthCoef, int movingAvgCoef) {
-        if (type == Enums::TransformateType::BPF) _points = bpf(_data->frame()->_points);
-        else if (type == Enums::TransformateType::ThreePointFilter) _points = threePointFilter(_data->frame()->_points);
-        else if (type == Enums::TransformateType::ExponentialSmoothing) _points = expSmoothing(_data->frame()->_points, expSmthCoef);
-        else if (type == Enums::TransformateType::MovingAverage) _points = movingAvg(_data->frame()->_points, movingAvgCoef);
+    void iChannel::trigger(Enums::TriggersType type, double level) {
+        if (type == Enums::TriggersType::TriggerByForwardFront) _points = triggerByForwardFront(_data->frame()->_points, level);
+        else if (type == Enums::TriggersType::TriggerByBackFront) _points = triggerByBackFront(_data->frame()->_points, level);
+        else if (type == Enums::TriggersType::TriggerByTime) _points = triggerByTime(_data->frame()->_points, level, _data->frame()->_divXValue);
         else _points = _data->frame()->_points;
+    }
+
+    void iChannel::transform(Enums::TransformateType type, double expSmthCoef, int movingAvgCoef) {
+        if (type == Enums::TransformateType::BPF) _points = bpf(_points);
+        else if (type == Enums::TransformateType::ThreePointFilter) _points = threePointFilter(_points);
+        else if (type == Enums::TransformateType::ExponentialSmoothing) _points = expSmoothing(_points, expSmthCoef);
+        else if (type == Enums::TransformateType::MovingAverage) _points = movingAvg(_points, movingAvgCoef);
     }
 
     /// ДЕСТРУКТОР
@@ -89,6 +97,18 @@ namespace oscilloscope {
 
     QVector<std::complex<double>> movingAvg(const QVector<std::complex<double> > &points, int coef) {
         return SignalSmoothing::movAverage(points, coef);
+    }
+
+    QVector<std::complex<double>> triggerByBackFront(const QVector<std::complex<double> > &points, double level) {
+        return Trigger::triggerByBackFront(points, level);
+    }
+
+    QVector<std::complex<double>> triggerByForwardFront(const QVector<std::complex<double> > &points, double level) {
+        return Trigger::triggerByForwardFront(points, level);
+    }
+
+    QVector<std::complex<double>> triggerByTime(const QVector<std::complex<double> > &points, double level, double step) {
+        return Trigger::triggerByTime(points, level, step);
     }
 }
 

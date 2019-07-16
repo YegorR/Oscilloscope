@@ -22,7 +22,6 @@ namespace oscilloscope {
                 QDataStream stream(_socket->read(4));
                 stream.setByteOrder(QDataStream::LittleEndian);
                 stream >> frameSize;
-                qDebug() << "FrameSize: " << frameSize;
             }
         }
 
@@ -33,8 +32,7 @@ namespace oscilloscope {
             } else {
                 QByteArray data = _socket->read(frameSize - 4);
                 frameSize = 0;
-                qDebug() << "Read to parse";
-                return FrameParser().parse(data);
+                return FrameParser::parse(data);
             }
         }
 
