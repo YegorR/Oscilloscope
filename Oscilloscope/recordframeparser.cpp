@@ -6,6 +6,7 @@ namespace oscilloscope {
 RecordFrameParser::RecordFrameParser(QString filename, QObject *parent) : QObject(parent)
 {
   _timer = new QTimer(this);
+  connect(_timer, SIGNAL(timeout()), this, SLOT(trigger()));
   _file = new QFile(filename);
 }
 
@@ -36,7 +37,7 @@ void RecordFrameParser::start() {
   QDataStream stream(_file); stream.setByteOrder(QDataStream::LittleEndian);
    _channelName = "Запись: " + FrameParser::readString(stream);
 
-  connect(_timer, SIGNAL(timeout()), this, SLOT(trigger()));
+
   _timer->setInterval(_milliPeriod);
   _timer->start();
 }
@@ -77,7 +78,6 @@ void RecordFrameParser::trigger() {
 }
 
 void RecordFrameParser::stop() {
-  disconnect(_timer);
   _timer->stop();
   if (_file->isOpen())
     _file->close();

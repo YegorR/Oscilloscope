@@ -15,7 +15,7 @@ namespace oscilloscope {
     Q_OBJECT
   private:
     QFile* _file;
-    int _milliPeriod = 1;
+    int _milliPeriod = 100;
     QTimer* _timer;
     QString _channelName;
 

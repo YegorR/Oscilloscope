@@ -116,7 +116,8 @@ namespace oscilloscope {
     stream.setFloatingPointPrecision(QDataStream::DoublePrecision);
     for(int i = 0; i < frame->_points.size();i++) {
         stream << (frame->_points.at(i).real());
-        stream << (frame->_points.at(i).imag());
+        if (frame->_isComplex)
+          stream << (frame->_points.at(i).imag());
       }
   }
 }
