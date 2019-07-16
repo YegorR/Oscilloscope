@@ -5,16 +5,12 @@ namespace oscilloscope {
 
 RecordFrameParser::RecordFrameParser(QString filename, QObject *parent) : QObject(parent)
 {
-  _timer = new NanoTimer(this);
+  _timer = new QTimer(this);
   _file = new QFile(filename);
 }
 
-quint64 RecordFrameParser::milliPeriod() const {
+int RecordFrameParser::milliPeriod() const {
   return _milliPeriod;
-}
-
-quint64 RecordFrameParser::nanoPeriod() const {
-  return _nanoPeriod;
 }
 
 QString RecordFrameParser::channelName() const {
@@ -40,9 +36,8 @@ void RecordFrameParser::start() {
   QDataStream stream(_file); stream.setByteOrder(QDataStream::LittleEndian);
    _channelName = "Запись: " + FrameParser::readString(stream);
 
-  _timer->setMilliPeriod(_milliPeriod);
-  _timer->setNanoPeriod(_nanoPeriod);
-  connect(_timer, SIGNAL(triggered()), this, SLOT(trigger()));
+  connect(_timer, SIGNAL(timeout()), this, SLOT(trigger()));
+  _timer->setInterval(_milliPeriod);
   _timer->start();
 }
 
@@ -82,20 +77,15 @@ void RecordFrameParser::trigger() {
 }
 
 void RecordFrameParser::stop() {
-  disconnect(_timer, SIGNAL(triggered()), this, SLOT(trigger()));
+  disconnect(_timer);
   _timer->stop();
   if (_file->isOpen())
     _file->close();
 }
 
-void RecordFrameParser::setMilliPeriod(quint64 milliPeriod) {
+void RecordFrameParser::setMilliPeriod(int milliPeriod) {
   _milliPeriod = milliPeriod;
-  _timer->setMilliPeriod(_milliPeriod);
-}
-
-void RecordFrameParser::setNanoPeriod(quint64 nanoPeriod) {
-  _nanoPeriod = nanoPeriod;
-  _timer->setNanoPeriod(_nanoPeriod);
+  _timer->setInterval(milliPeriod);
 }
 
 }

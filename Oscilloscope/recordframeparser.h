@@ -3,9 +3,9 @@
 
 #include <QObject>
 #include <QFile>
+#include <QTimer>
 
 #include "frame.h"
-#include "nanotimer.h"
 #include "frameparser.h"
 
 namespace oscilloscope {
@@ -15,16 +15,14 @@ namespace oscilloscope {
     Q_OBJECT
   private:
     QFile* _file;
-    quint64 _milliPeriod = 1;
-    quint64 _nanoPeriod = 0;
-    NanoTimer* _timer;
+    int _milliPeriod = 1;
+    QTimer* _timer;
     QString _channelName;
 
   public:
     explicit RecordFrameParser(QString filename, QObject *parent = nullptr);
 
-    quint64 milliPeriod() const;
-    quint64 nanoPeriod() const;
+    int milliPeriod() const;
     QString channelName() const;
     bool init();
   signals:
@@ -33,8 +31,7 @@ namespace oscilloscope {
   public slots:
     void start();
     void stop();
-    void setMilliPeriod(quint64 milliPeriod);
-    void setNanoPeriod(quint64 nanoPeriod);
+    void setMilliPeriod(int milliPeriod);
   private slots:
     void trigger();
   };

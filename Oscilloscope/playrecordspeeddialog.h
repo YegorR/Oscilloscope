@@ -19,17 +19,28 @@ namespace oscilloscope {
   private:
     RecordFrameParser* _parser;
     QLabel* _milliPeriodLabel;
-    QLabel* _nanoPeriodLabel;
     QLineEdit* _milliPeriodEdit;
-    QLineEdit* _nanoPeriodEdit;
     QIntValidator* _validator;
     QGridLayout* _layout;
-    QHBoxLayout *_buttonLayout;
+    QHBoxLayout *_mainButtonLayout;
+    QHBoxLayout *_speedButtonLayout;
+
     QPushButton* _okButton;
     QPushButton* _cancelButton;
+    QPushButton* _strongRightButton;
+    QPushButton* _weakRightButton;
+    QPushButton* _strongLeftButton;
+    QPushButton* _weakLeftButton;
+
+    void changeSpeed(int milliDelta);
+
   private slots:
     void clickOk();
     void clickCancel();
+    void clickStrongRight();
+    void clickWeakRight();
+    void clickStrongLeft();
+    void clickWeakLeft();
   public:
     PlayRecordSpeedDialog(RecordFrameParser* parser, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
   };

@@ -25,7 +25,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    nanotimer.cpp \
     playrecordspeeddialog.cpp \
     recorder.cpp \
     recordframeparser.cpp \
@@ -55,7 +54,6 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
-    nanotimer.h \
     playrecordspeeddialog.h \
     recorder.h \
     recordframeparser.h \
