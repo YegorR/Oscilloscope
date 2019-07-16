@@ -15,7 +15,7 @@ namespace oscilloscope {
 
     /// СОЗДАНИЕ КАНАЛА (ДУБЛИКАТА) НА ОСНОВЕ УЖЕ СУЩЕСТВУЮЩЕГО КАНАЛА
 
-    iChannel::iChannel(const iChannel *channel) : iChannel(channel->data()) {}
+    iChannel::iChannel(const iChannel *channel) : iChannel(channel->dataStream()) {}
 
     /// ПОЛУЧЕНИЕ ТИПА КАНАЛА (ДУБЛИКАТ ИЛИ ОРИГИНАЛ)
 
@@ -25,7 +25,7 @@ namespace oscilloscope {
 
     /// ПОЛУЧЕНИЕ ДАННЫХ КАНАЛА
 
-    DataStream *iChannel::data() const {
+    DataStream *iChannel::dataStream() const {
         return _data;
     }
 

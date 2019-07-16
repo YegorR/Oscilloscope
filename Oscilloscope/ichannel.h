@@ -18,7 +18,7 @@ namespace oscilloscope {
         Q_OBJECT
     public:
         int channelType() const;
-        DataStream *data() const;
+        DataStream *dataStream() const;
         QVector <std::complex<double>> points() const;
 
         void trigger(Enums::TriggersType type = Enums::TriggersType::WithoutTriggers, double level = 0.0);
@@ -30,7 +30,7 @@ namespace oscilloscope {
         QVector <std::complex<double>> _points;
 
     protected:
-        explicit iChannel(DataStream *data);
+        explicit iChannel(DataStream *dataStream);
         iChannel(const iChannel *channel);
 
         int _channelType;

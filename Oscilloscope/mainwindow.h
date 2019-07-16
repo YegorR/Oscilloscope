@@ -10,6 +10,8 @@
 #include "simplescope.h"
 #include "globalchannellist.h"
 #include "channelcontroller.h"
+#include "recorder.h"
+#include "recordframeparser.h"
 
 namespace Ui {
     class MainWindow;
@@ -33,6 +35,15 @@ namespace oscilloscope {
 
         void changeServerSettings();
 
+        void startRecord();
+        void stopRecord();
+        void loadRecord();
+        void playRecord();
+        void stopPlayingRecord();
+        void changeRecordSpeedSettings();
+
+        void showErrorMessage(QString errorMessage);
+
     private:
         Ui::MainWindow *ui;
 
@@ -40,9 +51,20 @@ namespace oscilloscope {
         GlobalChannelList *_channels;
         ChannelController *_channelController;
 
+        QVector<RecordFrameParser *> _recordFrameParsers;
         QMenu *_menu;
         QAction *_serverAct;
 
+        QMenu *_recordMenu;
+        QAction *_startRecordAct;
+        QAction *_stopRecordAct;
+        QAction *_loadAct;
+        QAction *_playAct;
+        QAction *_stopAct;
+
+        QAction *_speedRecordMenu;
+
+        Recorder* _recorder;
         int countScopes;
 
     protected:

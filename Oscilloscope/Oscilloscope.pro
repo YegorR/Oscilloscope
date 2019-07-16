@@ -25,6 +25,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
+    playrecordspeeddialog.cpp \
+    recorder.cpp \
+    recordframeparser.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
@@ -51,6 +54,9 @@ SOURCES += \
 
 HEADERS += \
         mainwindow.h \
+    playrecordspeeddialog.h \
+    recorder.h \
+    recordframeparser.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
