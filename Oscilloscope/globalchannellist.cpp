@@ -20,14 +20,14 @@ namespace oscilloscope {
 
         _channelsView->repaint();
 
-        emit channelUpdated(channel->data()->frame()->_channelName);
+        emit channelUpdated(channel->dataStream()->frame()->_channelName);
     }
 
     /// ПОЛУЧЕНИЕ ИНДЕКСА ОРИГИНАЛЬНОГО КАНАЛА ПО ЕГО ИМЕНИ
 
     int GlobalChannelList::indexByName(const QString name) const {
         for (int i = 0; i < _channels->length(); i++)
-            if (_channels->at(i)->data()->frame()->_channelName == name)
+            if (_channels->at(i)->dataStream()->frame()->_channelName == name)
                 return i;
 
         return -1;
@@ -37,10 +37,22 @@ namespace oscilloscope {
 
     void GlobalChannelList::add(iChannel *channel, bool alive) {
         iChannelList::add(channel);
-        _channelsView->addItem(channel->data()->frame()->_channelName);
+        _channelsView->addItem(channel->dataStream()->frame()->_channelName);
 
         if (alive) _channelsView->item(_channelsView->count() - 1)->setTextColor(CH_ALIVE);
             else _channelsView->item(_channelsView->count() - 1)->setTextColor(CH_DEAD);
+    }
+
+    /// ПОЛУЧЕНИЕ ВЫБРАННОГО КАНАЛА
+
+    iChannel *GlobalChannelList::getSelectedChannel() const {
+      QList <QListWidgetItem*> selectedItems = _channelsView->selectedItems();
+      if (selectedItems.isEmpty()) {
+          return nullptr;
+        }
+      QListWidgetItem* item = selectedItems.first();
+      QString name = item->text();
+      return _channels->at(indexByName(name));
     }
 
     /// ДЕСТРУКТОР

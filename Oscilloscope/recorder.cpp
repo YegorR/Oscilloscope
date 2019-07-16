@@ -38,18 +38,19 @@ namespace oscilloscope {
   }
 
 
-  Recorder::RecorderThread::RecorderThread(DataStream *dataStream) : _dataStream(dataStream) {
+  RecorderThread::RecorderThread(DataStream *dataStream) : _dataStream(dataStream) {
     _buffer = new QBuffer(this);
   }
 
-  void Recorder::RecorderThread::process() {
+  void RecorderThread::process() {
+    _buffer->open(QIODevice::WriteOnly);
     QDataStream stream(_buffer);
     stream.setByteOrder(QDataStream::LittleEndian);
     writeString(stream, _dataStream->frame()->_channelName);
     connect(_dataStream, SIGNAL(receivedFrame(Frame*)), this, SLOT(receiveFrame(Frame*)));
   }
 
-  void Recorder::RecorderThread::receiveFrame(Frame *frame) {
+  void RecorderThread::receiveFrame(Frame *frame) {
     if (!_isInterrupted) {
         QDataStream stream(_buffer);
         stream.setByteOrder(QDataStream::LittleEndian);
@@ -62,23 +63,24 @@ namespace oscilloscope {
         stream << static_cast<quint32>(frame->_points.size());
         stream << static_cast<qint32>(frame->_offsetX.at(0));
         stream << frame->_time;
-        frame->_isComplex ? stream << static_cast<quint8>(1) : stream << static_cast<quint8>(0);
+        frame->_isComplex ? stream << static_cast<quint32>(1) : stream << static_cast<quint32>(0);
 
         writeValues(stream, frame);
       }
   }
 
-  void Recorder::RecorderThread::stop() {
+  void RecorderThread::stop() {
     _isInterrupted = true;
+    _buffer->close();
     disconnect(_dataStream, SIGNAL(receivedFrame(Frame*)), this, SLOT(receiveFrame(Frame*)));
     emit(stopped());
   }
 
-  bool Recorder::RecorderThread::isRecorded() const {
+  bool RecorderThread::isRecorded() const {
     return (_isInterrupted) && (!_buffer->buffer().isEmpty());
   }
 
-  void Recorder::RecorderThread::save(QString filename) {
+  void RecorderThread::save(QString filename) {
     if (!isRecorded()) {
         return;
       }
@@ -101,6 +103,12 @@ namespace oscilloscope {
     stream << static_cast<quint8>(size);
     for (int i = 0; i < byteArray.size(); ++i) {
         stream << static_cast<quint8>(byteArray.at(i));
+      }
+    if ((size + 1) % 4 == 0) {
+        return;
+      }
+    for (int i = 0; i < 4 - ((size + 1) % 4); ++i) {
+        stream << static_cast<quint8>(0);
       }
   }
 

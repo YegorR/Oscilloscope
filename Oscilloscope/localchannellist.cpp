@@ -25,7 +25,7 @@ namespace oscilloscope {
     void LocalChannelList::add(DublicateChannel *channel) {
         iChannelList::add(channel);
 
-        channel->setName(DUBLICATE_NAME(_countDublicates++, channel->data()->frame()->_channelName));
+        channel->setName(DUBLICATE_NAME(_countDublicates++, channel->dataStream()->frame()->_channelName));
         _channelsView->addChannel(channel->name());
     }
 
@@ -56,7 +56,7 @@ namespace oscilloscope {
 
     void LocalChannelList::dublicatesDelete(const QString nameParent) {
         for (int i = 0; i < _channels->size(); i++) {
-            if (_channels->at(i)->data()->frame()->_channelName == nameParent) {
+            if (_channels->at(i)->dataStream()->frame()->_channelName == nameParent) {
                 delete _channels->at(i);
                 _channels->removeAt(i--);
             }

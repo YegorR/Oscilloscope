@@ -25,7 +25,6 @@ namespace oscilloscope {
 
         void add(iChannel *channel);
         virtual int indexByName(const QString name) const = 0;
-
         ~iChannelList();
 
     protected slots:

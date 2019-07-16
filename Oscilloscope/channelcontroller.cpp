@@ -14,7 +14,6 @@ namespace oscilloscope {
     ChannelController::ChannelController(GlobalChannelList *channels) {
         _tcpServer = nullptr;
         _udpServer = nullptr;
-
         _globalChannelList = channels;
 
         reloadTcpServer();
@@ -23,35 +22,36 @@ namespace oscilloscope {
 
     /// СОЗДАНИЕ ТСП СЕРВЕРА
 
-    bool ChannelController::createTcpServer(quint16 port) {
-        if (_tcpServer != nullptr) {
-            _tcpServer->stop();
-            _tcpServer->disconnect();
+        bool ChannelController::createTcpServer(quint16 port) {
+            if (_tcpServer != nullptr) {
+                _tcpServer->stop();
+                _tcpServer->disconnect();
 
-            delete _tcpServer;
+                delete _tcpServer;
+            }
+
+            _tcpServer = new TcpServer(port, this);
+            connect(_tcpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
+
+            return _tcpServer->start();
         }
 
-        _tcpServer = new TcpServer(port, this);
-        connect(_tcpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
+        /// СОЗДАНИЕ УДП СЕРВЕРА
 
-        return _tcpServer->start();
-    }
+        bool ChannelController::createUdpServer(quint16 port) {
+            if (_udpServer != nullptr) {
+                _udpServer->stop();
+                _udpServer->disconnect();
 
-    /// СОЗДАНИЕ УДП СЕРВЕРА
+                delete _udpServer;
+            }
 
-    bool ChannelController::createUdpServer(quint16 port) {
-        if (_udpServer != nullptr) {
-            _udpServer->stop();
-            _udpServer->disconnect();
+            _udpServer = new UdpServer(port, this);
+            connect(_udpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
 
-            delete _udpServer;
+            return _udpServer->start();
         }
 
-        _udpServer = new UdpServer(port, this);
-        connect(_udpServer, SIGNAL(frame(Frame *)), this, SLOT(receiveFrame(Frame *)));
-
-        return _udpServer->start();
-    }
 
     /// ПЕРЕЗАГРУКА ТСП СЕРВЕРА
 
@@ -90,14 +90,22 @@ namespace oscilloscope {
         } else {
             channel = static_cast<Channel *>(_globalChannelList->channels()->at(index));
 
-            if (channel->data()->frame()->_time == frame->_time) {
-                channel->data()->insert(frame);
-            } else channel->data()->update(frame);
+            if (channel->dataStream()->frame()->_time == frame->_time) {
+                channel->dataStream()->insert(frame);
+            } else channel->dataStream()->update(frame);
 
             channel->channelConnected();
 
-            emit channelUpdated(channel->data()->frame()->_channelName);
+            emit channelUpdated(channel->dataStream()->frame()->_channelName);
         }
+    }
+
+    void ChannelController::addRecordFrameParser(RecordFrameParser *parser)
+    {
+      connect(parser, SIGNAL(frame(Frame*)), this, SLOT(receiveFrame(Frame*)));
+      Frame* channelNameFrame = new Frame();
+      channelNameFrame->_channelName = parser->channelName();
+      receiveFrame(channelNameFrame);
     }
 }
 

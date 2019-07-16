@@ -17,21 +17,40 @@ quint64 RecordFrameParser::nanoPeriod() const {
   return _nanoPeriod;
 }
 
+QString RecordFrameParser::channelName() const {
+  return _channelName;
+}
+
+bool RecordFrameParser::init() {
+  if (!_file->open(QIODevice::ReadOnly)) {
+      emit error("Ошибка: " + QString::number(_file->error()));
+      return false;
+    }
+  QDataStream stream(_file); stream.setByteOrder(QDataStream::LittleEndian);
+   _channelName = "Запись: " + FrameParser::readString(stream);
+   _file->close();
+   return true;
+}
+
 void RecordFrameParser::start() {
   if (!_file->open(QIODevice::ReadOnly)) {
       emit error("Ошибка: " + QString::number(_file->error()));
       return;
     }
   QDataStream stream(_file); stream.setByteOrder(QDataStream::LittleEndian);
-   _channelName = FrameParser::readString(stream);
+   _channelName = "Запись: " + FrameParser::readString(stream);
 
   _timer->setMilliPeriod(_milliPeriod);
   _timer->setNanoPeriod(_nanoPeriod);
-  connect(_timer, SIGNAL(triggered()), this, SLOT(triger()));
+  connect(_timer, SIGNAL(triggered()), this, SLOT(trigger()));
   _timer->start();
 }
 
 void RecordFrameParser::trigger() {
+  if (_file->atEnd()) {
+      stop();
+      return;
+    }
   Frame* newFrame = new Frame();
   newFrame->_channelName = _channelName;
   QDataStream stream(_file); stream.setByteOrder(QDataStream::LittleEndian);
@@ -48,7 +67,7 @@ void RecordFrameParser::trigger() {
 
   stream >> newFrame->_time;
 
-  quint8 isComplex;
+  quint32 isComplex;
   stream >> isComplex;
   newFrame->_isComplex = (!(isComplex==0));
   stream.setFloatingPointPrecision(QDataStream::DoublePrecision);
@@ -65,7 +84,8 @@ void RecordFrameParser::trigger() {
 void RecordFrameParser::stop() {
   disconnect(_timer, SIGNAL(triggered()), this, SLOT(trigger()));
   _timer->stop();
-  _file->close();
+  if (_file->isOpen())
+    _file->close();
 }
 
 void RecordFrameParser::setMilliPeriod(quint64 milliPeriod) {

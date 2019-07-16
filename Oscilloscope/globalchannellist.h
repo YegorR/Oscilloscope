@@ -19,6 +19,7 @@ namespace oscilloscope {
 
         void add(iChannel *channel, bool alive = true);
         int indexByName(const QString name) const;
+        iChannel *getSelectedChannel() const;
 
         ~GlobalChannelList();
 

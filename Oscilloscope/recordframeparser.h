@@ -25,6 +25,8 @@ namespace oscilloscope {
 
     quint64 milliPeriod() const;
     quint64 nanoPeriod() const;
+    QString channelName() const;
+    bool init();
   signals:
     void error(QString errorString);
     void frame(Frame *frame);

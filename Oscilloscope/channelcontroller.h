@@ -8,6 +8,7 @@
 #include "server.h"
 #include "frame.h"
 #include "globalchannellist.h"
+#include "recordframeparser.h"
 
 namespace oscilloscope {
     class ChannelController : public QObject {
@@ -24,6 +25,7 @@ namespace oscilloscope {
 
         bool createTcpServer(quint16 port);
         bool createUdpServer(quint16 port);
+        void addRecordFrameParser(RecordFrameParser* parser);
 
     private slots:
         void receiveFrame(Frame *);

@@ -1,55 +1,70 @@
 #include "nanotimer.h"
 
 #include <thread>
+#include <QDebug>
 
-NanoTimer::NanoTimer(QObject *parent) : QObject(parent)
-{
-  _thread = new QThread(this);
-  _timerThread.moveToThread(_thread);
-  connect(_thread, SIGNAL(started()), &_timerThread, SLOT(process()));
-  connect(_thread, SIGNAL(finished()), &_timerThread, SLOT(stop()));
-  connect(&_timerThread, SIGNAL(triggered()), this, SIGNAL(triggered()));
-}
+namespace oscilloscope {
 
-void NanoTimer::start() {
-  _thread->start();
-}
+  NanoTimer::NanoTimer(QObject *parent) : QObject(parent)
+  {
+    _thread = new QThread(this);
+    _timerThread.moveToThread(_thread);
+    connect(_thread, SIGNAL(started()), &_timerThread, SLOT(process()));
+    connect(&_timerThread, SIGNAL(stopped()), _thread, SLOT(quit()));
+    connect(&_timerThread, SIGNAL(triggered()), this, SIGNAL(triggered()));
+  }
 
-void NanoTimer::stop() {
-  _thread->quit();
-}
+  void NanoTimer::start() {
+    _timerThread.init();
+    _thread->start();
+  }
 
-NanoTimer::~NanoTimer() {
-  stop();
-}
+  void NanoTimer::stop() {
+    _timerThread.stop();
+  }
 
-void NanoTimer::setMilliPeriod(unsigned long milliPeriod) {
-  _timerThread.setMilliPeriod(milliPeriod);
-}
+  NanoTimer::~NanoTimer() {
+    stop();
+  }
 
-void NanoTimer::setNanoPeriod(unsigned long nanoPeriod)
-{
-  _timerThread.setNanoPeriod(nanoPeriod);
-}
+  void NanoTimer::setMilliPeriod(unsigned long milliPeriod) {
+    _timerThread.setMilliPeriod(milliPeriod);
+  }
+
+  void NanoTimer::setNanoPeriod(unsigned long nanoPeriod)
+  {
+    _timerThread.setNanoPeriod(nanoPeriod);
+  }
 
 
-void NanoTimer::TimerThread::process() {
-  while(!_isInterrupted) {
-      unsigned long samplingPeriod = _nanoPeriod * 1000000 + _milliPeriod;
-      std::this_thread::sleep_for(std::chrono::nanoseconds(samplingPeriod));
-      if (!_isInterrupted) {
-          emit triggered();
-        }
-    }
-}
-void NanoTimer::TimerThread::stop() {
-  _isInterrupted = true;
-}
+  void TimerThread::process() {
+    while(!_isInterrupted) {
+        //qDebug() << "Tick";
+        unsigned long samplingPeriod = _nanoPeriod + _milliPeriod * 1000000;
+        std::this_thread::sleep_for(std::chrono::nanoseconds(samplingPeriod));
+        if (!_isInterrupted) {
+          //  qDebug() << "Tuck";
+            emit triggered();
+          }
+      }
 
-void NanoTimer::TimerThread::setMilliPeriod(unsigned long milliPeriod) {
-  this->_milliPeriod = milliPeriod;
-}
+    emit stopped();
+  }
+  void TimerThread::stop() {
+    _isInterrupted = true;
+    emit stopped();
+  }
 
-void NanoTimer::TimerThread::setNanoPeriod(unsigned long nanoPeriod) {
-  this->_nanoPeriod = nanoPeriod;
+  void TimerThread::setMilliPeriod(unsigned long milliPeriod) {
+    this->_milliPeriod = milliPeriod;
+  }
+
+  void TimerThread::setNanoPeriod(unsigned long nanoPeriod) {
+    this->_nanoPeriod = nanoPeriod;
+  }
+
+  void TimerThread::init() {
+    _isInterrupted = false;
+  }
+
 }

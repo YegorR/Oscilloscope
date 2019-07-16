@@ -159,7 +159,7 @@ namespace oscilloscope {
 
             /// ПРОВЕРКА НА КОМПЛЕКСНОЕ ЧИСЛО
 
-            if (ch->data()->frame()->_isComplex) {
+            if (ch->dataStream()->frame()->_isComplex) {
                 ui->ImgLayout->setEnabled(true);
                 ui->ShowReal->setEnabled(true);;
             } else {
@@ -215,7 +215,7 @@ namespace oscilloscope {
                         index = _channels->indexByName(channel->text());
                         ch = _channels->channels()->at(index);
 
-                        name = ch->data()->frame()->_channelName;
+                        name = ch->dataStream()->frame()->_channelName;
                         index = _globalList->indexByName(name);
                         Channel *temp = dynamic_cast<Channel *>(_globalList->channels()->at(index));
 
@@ -245,7 +245,7 @@ namespace oscilloscope {
             bool alive = std::get<2>(_tuple);
 
             QVector<std::complex<double>> points = channel->points();
-            QVector<double> offsetX = channel->data()->frame()->_offsetX;
+            QVector<double> offsetX = channel->dataStream()->frame()->_offsetX;
 
             if (points.count() > 0) {
                 /// ОТРИСОВКА ДЕЙСТВИТЕЛЬНОЙ ЧАСТИ
@@ -270,7 +270,7 @@ namespace oscilloscope {
 
                 /// ОТРИСОВКА МНИМОЙ ЧАСТИ
 
-                if (atr->_showImag && channel->data()->frame()->_isComplex) {
+                if (atr->_showImag && channel->dataStream()->frame()->_isComplex) {
                     QLineSeries *series = new QLineSeries();
                     series->setName(name + "IMAG");
 
@@ -322,7 +322,7 @@ namespace oscilloscope {
                 int index = _channels->indexByName(channel->text());
                 ch = _channels->channels()->at(index);
 
-                name = ch->data()->frame()->_channelName;
+                name = ch->dataStream()->frame()->_channelName;
                 index = _globalList->indexByName(name);
 
                 Channel *temp = dynamic_cast<Channel *>(_globalList->channels()->at(index));
