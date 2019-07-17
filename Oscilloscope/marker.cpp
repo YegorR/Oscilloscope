@@ -10,6 +10,7 @@ namespace oscilloscope {
         QLogValueAxis *rangeY = static_cast<QLogValueAxis*>(_graph->axisY());
 
         _series = new QLineSeries();
+        _series->setName("Marker");
 
         _series->append(_graph->mapToValue(QPointF(_x, 0)).x(), rangeY->min());
         _series->append(_graph->mapToValue(QPointF(_x, 0)).x(), rangeY->max());

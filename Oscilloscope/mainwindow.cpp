@@ -240,7 +240,6 @@ namespace oscilloscope {
             SimpleScope *scope = _scopes.at(i);
 
             scope->localList()->channelsView()->deleteChannel(name);
-            scope->repaint();
 
             scope->deleteDublicates(name);
 
@@ -248,6 +247,8 @@ namespace oscilloscope {
             scope->localList()->dublicatesDelete(name);
 
             scope->deleteChannel(name);
+
+            scope->repaint();
         }
     }
 

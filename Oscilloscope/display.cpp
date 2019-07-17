@@ -365,8 +365,9 @@ namespace oscilloscope {
     void Display::deleteGraph(const QString &name) {
         QList<QAbstractSeries *> list = _graph->series();
 
-        for (int i = 1; i < list.size(); i++)
-            if (list.at(i)->name() == name) _graph->removeSeries(list.at(i));
+        for (int i = 3; i < list.size(); i++)
+            if (list.at(i)->name() == name)
+                _graph->removeSeries(list.at(i));
     }
 
     /// УДАЛЕНИЕ ДУБЛИКАТОВ ПО НАЗВАНИЮ ОРИГИНАЛА
@@ -374,7 +375,7 @@ namespace oscilloscope {
     void Display::deleteDublicatesGraph(const QString &name) {
         QList<QAbstractSeries *> list = _graph->series();
 
-        for (int i = 1; i < list.size(); i++)
+        for (int i = 3; i < list.size(); i++)
             if (list.at(i)->name().contains(DUBLICATE_NAME_BY_PARENT(name), Qt::CaseInsensitive) ||
                 list.at(i)->name().contains(DUBLICATE_NAME_BY_PARENT(name) + "IMAG", Qt::CaseInsensitive))
                     _graph->removeSeries(list.at(i));

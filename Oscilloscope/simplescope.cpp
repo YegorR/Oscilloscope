@@ -168,6 +168,8 @@ namespace oscilloscope {
 
                 connect(ui->TransformSpinDouble, SIGNAL(valueChanged(double)), this, SLOT(repaint()));
                 connect(ui->TransformSpinInt, SIGNAL(valueChanged(int)), this, SLOT(repaint()));
+
+                _display->markersRecount();
             } else {
                 // ИЗМЕНЕНИЕ АТРИБУТОВ В СООТВЕТСТВИИ С ИХ ВЫВОДОМ
 
@@ -271,6 +273,7 @@ namespace oscilloscope {
             ui->TriggerLevel->setEnabled(atr->_triggerType != Enums::TriggersType::WithoutTriggers);
         } else {
             _display->setCurrentChannel(nullptr);
+            _display->deleteGraph("MinMaxPoint");
 
             ui->channelName->setText("Канал не выбран");
             ui->channelController->hide();
@@ -285,7 +288,8 @@ namespace oscilloscope {
         if (channel->isChecked()) recount(channel->text());
             else {
                 deleteChannel(channel->text());
-                minMaxUpdate();
+                if ((dynamic_cast<QCheckBox *>(_channels->channelsView()->itemWidget(_channels->channelsView()->currentItem()))) == channel)
+                    _display->deleteGraph("MinMaxPoint");
             }
     }
 
@@ -385,9 +389,7 @@ namespace oscilloscope {
                     _display->addGraph(series);
                 } else _display->deleteGraph(name + "IMAG");
             }
-        }
-
-        minMaxUpdate();
+        };
     }
 
     /// ПЕРЕСЧЕТ ТОЧЕК ГРАФИКА КАНАЛА
@@ -474,8 +476,6 @@ namespace oscilloscope {
     void SimpleScope::deleteChannel(const QString &name) {
         _display->deleteGraph(name);
         _display->deleteGraph(name + "IMAG");
-
-        minMaxUpdate();
     }
 
     void SimpleScope::deleteDublicates(const QString &name) {
