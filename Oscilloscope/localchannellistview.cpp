@@ -19,7 +19,7 @@ namespace oscilloscope {
 
     /// ОТСЛЕЖИВАНИЯ ПЕРЕМЕЩЕНИЯ ЗАХВАЧЕННОГО ОБЪЕКТА
 
-    void LocalChannelListView::dragMoveEvent(QDragMoveEvent* event) {
+    void LocalChannelListView::dragMoveEvent(QDragMoveEvent *event) {
         if (event->mimeData()->hasFormat("application/x-item") && event->source() != this) {
             QString name = event->mimeData()->data("application/x-item");
 
@@ -30,7 +30,7 @@ namespace oscilloscope {
 
     /// ПРИНЯТИЕ ЗАХВАЧЕННОГО ОБЪЕКТА
 
-    void LocalChannelListView::dropEvent(QDropEvent* event) {
+    void LocalChannelListView::dropEvent(QDropEvent *event) {
         if (event->mimeData()->hasFormat("application/x-item")) {
             event->accept();
 
@@ -42,14 +42,14 @@ namespace oscilloscope {
 
     /// ОТСЛЕЖИВАНИЯ СТОЛКНОВЕНИЯ С ЗАХВАЧЕННЫМ ОБЪЕКТОМ
 
-    void LocalChannelListView::dragEnterEvent(QDragEnterEvent* event) {
+    void LocalChannelListView::dragEnterEvent(QDragEnterEvent *event) {
         if (event->mimeData()->hasFormat("application/x-item")) event->accept();
             else event->ignore();
     }
 
     /// ПОЛУЧЕНИЕ ОРИГИНАЛА ПО ЕГО ИМЕНИ
 
-    QListWidgetItem *LocalChannelListView::itemByName(QString name) const {
+    QListWidgetItem *LocalChannelListView::itemByName(const QString &name) const {
         QCheckBox *item;
 
         for (int i = 0; i < this->count(); i++) {
@@ -64,12 +64,13 @@ namespace oscilloscope {
 
     /// ПОЛУЧЕНИЕ ДУБЛИКАТА ПО ЕГО ИМЕНИ
 
-    QListWidgetItem *LocalChannelListView::itemDublicateByName(QString name) const {
+    QListWidgetItem *LocalChannelListView::itemDublicateByName(const QString &name) const {
         QCheckBox *item;
 
         for (int i = 0; i < this->count(); i++) {
             item = dynamic_cast<QCheckBox *>(this->itemWidget(this->item(i)));
-            if (item->text().contains(DUBLICATE_NAME_BY_PARENT(name), Qt::CaseInsensitive)) return this->item(i);
+            if (item->text().contains(DUBLICATE_NAME_BY_PARENT(name), Qt::CaseInsensitive))
+                return this->item(i);
         }
 
         return 0;
@@ -77,7 +78,7 @@ namespace oscilloscope {
 
     /// ДОБАВЛЕНИЯ КАНАЛА В СПИСОК ОТОБРАЖЕНИЯ
 
-    void LocalChannelListView::addChannel(QString name) {;
+    void LocalChannelListView::addChannel(const QString &name) {;
         QCheckBox *channel = new QCheckBox(name);
         connect(channel, SIGNAL(stateChanged(int)), this, SLOT(itemCheck()));
 
@@ -108,7 +109,7 @@ namespace oscilloscope {
 
     /// УДАЛЕНИЕ ОРИГИНАЛА ПО ЕГО НАЗВАНИЮ
 
-    void LocalChannelListView::deleteChannel(const QString name) {
+    void LocalChannelListView::deleteChannel(const QString &name) {
         QListWidgetItem *item = this->itemByName(name);
 
         if (item) {
@@ -121,7 +122,7 @@ namespace oscilloscope {
 
     /// УДАЛЕНИЕ ВСЕХ ДУБЛИКАТОВ ПО НАЗВАНИЮ ОРИГИНАЛА
 
-    void LocalChannelListView::deleteDublicates(const QString name) {
+    void LocalChannelListView::deleteDublicates(const QString &name) {
         QListWidgetItem *item;
 
         while ((item = this->itemDublicateByName(name))) {

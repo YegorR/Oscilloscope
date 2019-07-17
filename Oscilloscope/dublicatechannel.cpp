@@ -13,13 +13,13 @@ namespace oscilloscope {
 
     /// ПОЛУЧЕНИЕ ИМЕНИ ДУБЛИКАТА
 
-    QString DublicateChannel::name() const {
+    const QString DublicateChannel::name() const {
         return _name;
     }
 
     /// ИЗМЕНЕНИЕ ИМЕНИ ДУБЛИКАТА
 
-    QString DublicateChannel::setName(QString name) {
+    const QString DublicateChannel::setName(const QString &name) {
         return (_name = name);
     }
 }

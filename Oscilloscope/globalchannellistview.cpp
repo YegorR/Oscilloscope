@@ -5,6 +5,8 @@
 #include "channellist.h"
 #include "globalchannellistview.h"
 
+#include <QDebug>
+
 namespace oscilloscope {
     /// КОНСТРУТОР - СОЗДАНИЕ СПИСКА ОТОБРАЖЕНИЯ ОРИГИНАЛЬНЫХ КАНАЛОВ
 

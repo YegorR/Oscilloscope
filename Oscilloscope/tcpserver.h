@@ -16,7 +16,7 @@ namespace oscilloscope {
         QTcpServer *_server;
 
     public:
-        TcpServer(quint16 port, QObject *parent = nullptr);
+        explicit TcpServer(quint16 port, QObject *parent = nullptr);
 
         bool start();
         void stop();
@@ -26,6 +26,7 @@ namespace oscilloscope {
     private slots:
         void receiveConnection();
         void receiveData(TcpClient *client);
+
     };
 }
 

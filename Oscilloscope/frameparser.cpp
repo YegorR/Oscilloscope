@@ -4,8 +4,6 @@
 #include <QIODevice>
 #include <complex>
 
-#include <QDebug>
-
 namespace oscilloscope {
     /// ПАРСИНГ ПОЛУЧЕННЫХ ДАННЫХ
 
@@ -40,7 +38,7 @@ namespace oscilloscope {
         quint32 N;
         stream >> N;
 
-        qint32 offsetX;
+        quint32 offsetX;
         stream >> offsetX;
         frame->_offsetX.push_back(offsetX * frame->_divXValue);
 

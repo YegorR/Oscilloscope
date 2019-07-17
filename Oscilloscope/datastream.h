@@ -15,7 +15,7 @@ namespace oscilloscope {
             Frame *_frame;
 
         public:
-            DataStream(Frame *frame);
+            explicit DataStream(Frame *frame);
 
             Frame *frame() const;
             void update(Frame *);
@@ -25,7 +25,7 @@ namespace oscilloscope {
 
         signals:
             void update();
-            void receivedFrame(Frame* frame);
+            void receivedFrame(Frame *frame);
     };
 }
 

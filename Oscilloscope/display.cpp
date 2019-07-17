@@ -1,15 +1,22 @@
 #include "display.h"
 #include "dublicatechannel.h"
+#include "markermeasurements.h"
 
 #include <QDebug>
 
 namespace oscilloscope {
+    /// КОНСТРУКТОР
+
     Display::Display() : QChartView() {
         _graph = new QChart();
         _graph->legend()->hide();
 
         this->setChart(_graph);
+
         this->setRenderHint(QPainter::Antialiasing);
+        this->setStyleSheet("background-color: rgb(64, 64, 64)");
+
+        // НАСТРОЙКА ОСЕЙ
 
         QValueAxis *xAxis = new QValueAxis();
         xAxis->setRange(0, 100);
@@ -20,6 +27,8 @@ namespace oscilloscope {
         _graph->addAxis(xAxis, Qt::AlignBottom);
         _graph->addAxis(yAxis, Qt::AlignLeft);
 
+        // НАСТРОЙКА КЛАВИШ
+
         _mouseGrab = false;
         _zoomRect = false;
 
@@ -27,13 +36,7 @@ namespace oscilloscope {
         _keyShift = false;
         _keyCtrl = false;
 
-        _minX = 0;
-        _maxX = 100;
-
-        _minY = -10;
-        _maxY = 10;
-
-        this->setStyleSheet("background-color: rgb(64, 64, 64)");
+        // СОЗДАНИЕ СЕРИИ, ОТВЕЧАЮЩАЯ ЗА ПРЯМОУГОЛЬНИК, ПО КОТОРОМУ БУДЕТ ПРОИСХОДИТЬ СКЕЙЛИНГ
 
         _zoomArea = new QAreaSeries();
 
@@ -47,6 +50,8 @@ namespace oscilloscope {
         _zoomArea->setOpacity(0.2);
         _zoomArea->setBorderColor(Qt::black);
         _zoomArea->setBrush(QBrush(Qt::gray));
+
+        // СОЗДАНИЕ ЛЭЙБЛА С КООРДИНАТАМИ КУРСОРА МЫШИ ОТНОСИТЕЛЬНО СИСТЕМЫ КООРДИНАТ
 
         this->setMouseTracking(true);
         _graph->setAcceptHoverEvents(true);
@@ -62,7 +67,22 @@ namespace oscilloscope {
         _mouseCord->setFont(font);
 
         _mouseCord->show();
+
+        // СОЗДАНИЕ МАРКЕРОВ
+
+        createMarker(_graph->plotArea().x());
+        createMarker(_graph->plotArea().width() + _graph->plotArea().x());
+
+        _currentChannel = nullptr;
     }
+
+    /// ИЗМЕНЕНИЕ ТЕКУЩЕГО ВЫБРАННОГО КАНАЛА
+
+    void Display::setCurrentChannel(iChannel *channel) {
+        _currentChannel = channel;
+    }
+
+    /// ОБРАБОТКА СОБЫТИЙ НАЖАТИЯ КНОПОК МЫШИ
 
     void Display::mousePressEvent(QMouseEvent *event) {
         if (event->button() == Qt::LeftButton) {
@@ -87,35 +107,19 @@ namespace oscilloscope {
                     _zoomRect = true;
                 }
             }
+        } else if (event->button() == Qt::MiddleButton) {
+            scaleByCenter();
         } else if (event->button() == Qt::RightButton) {
-            QList<QAbstractSeries *> list = _graph->series();
+            _startX = event->x();
+            _startY = event->y();
 
-            if (list.size() > 1) {
-                QLineSeries *line = static_cast<QLineSeries *>(list.at(1));
-                QVector<QPointF> points = line->pointsVector();
-
-                double minX = points.at(0).x(), maxX = points.at(0).x(), maxY = points.at(0).y(), minY = points.at(0).y();
-
-                for (int i = 1; i < list.size(); i++) {
-                    line = static_cast<QLineSeries *>(list.at(i));
-                    points = line->pointsVector();
-
-                    for (int j = 0; j < points.size(); j++) {
-                        double x = points.at(j).x();
-                        double y = points.at(j).y();
-
-                        if (x > maxX) maxX = x;
-                        if (x < minX) minX = x;
-
-                        if (y > maxY) maxY = y;
-                        if (y < minY) minY = y;
-                    }
-                }
-
-                zoomRect(minX, maxX, minY < 0 ? minY * 2 : minY / 2, maxY > 0 ? maxY * 2 : maxY / 2);
-            } else zoomRect(0, 100, -10, 10);
+            if (_startX >= _graph->plotArea().x() && _startX <= _graph->plotArea().x() + _graph->plotArea().width() &&
+                    _startY >= _graph->plotArea().y() && _startY <= _graph->plotArea().y() + _graph->plotArea().height())
+                moveMarker(_startX);
         }
     }
+
+    /// ОБРАБОТКА СОБЫТИЙ ОТПУСКАНИЯ КНОПОК МЫШИ
 
     void Display::mouseReleaseEvent(QMouseEvent *event) {
         if (event->button() == Qt::LeftButton) {
@@ -132,7 +136,11 @@ namespace oscilloscope {
         }
     }
 
+    /// ОБРАБОТКА ДВИЖЕНИЯ КУРСОРА МЫШИ
+
     void Display::mouseMoveEvent(QMouseEvent *event) {
+        // ОБНОВЛЕНИЕ ПОСЛЕДНИХ КООРДИНАТ
+
         double x = event->x();
         double y = event->y();
 
@@ -166,6 +174,8 @@ namespace oscilloscope {
         }
 
         if (_mouseGrab) {
+            // ПЕРЕДВИЖЕНИЕ ГРАФИКА
+
             double divX = (_startX - event->globalX());
             double divY = (event->globalY() - _startY);
 
@@ -193,7 +203,14 @@ namespace oscilloscope {
 
             _startX = event->globalX();
             _startY = event->globalY();
+
+            _dispalyMarkers.at(0)->update();
+            _dispalyMarkers.at(1)->update();
+
+            markersRecount();
         } else if (_zoomRect) {
+            // ПРИБЛИЖЕНИЕ ГРАФИКА ПО ВЫДЕЛЕННОМУ ПРЯМОУГОЛЬНИКУ
+
             if (_startX != _endX && _startY != _endY) {
                 QLineSeries *upper = new QLineSeries();
                 QLineSeries *lower = new QLineSeries();
@@ -212,9 +229,11 @@ namespace oscilloscope {
         }
     }
 
+    /// ОБРАБОТКА СОБЫТИЙ КОЛЕСИКА МЫШИ
+
     void Display::wheelEvent(QWheelEvent *event) {
         if (event->angleDelta().y() > 0.5) {
-            /// ОТДАЛЕНИЕ
+            // ОТДАЛЕНИЕ
 
             if (!_keyAlt && !_keyCtrl) {
                 horizontalZoom(true);
@@ -224,7 +243,7 @@ namespace oscilloscope {
                     else verticalZoom(true);
             }
         } else if (event->angleDelta().y() < -0.5) {
-            /// ПРИБЛИЖЕНИЕ
+            // ПРИБЛИЖЕНИЕ
 
             if (!_keyAlt && !_keyCtrl) {
                 horizontalZoom(false);
@@ -236,9 +255,11 @@ namespace oscilloscope {
         }
     } 
 
+    /// ГОРИЗОНТАЛЬНОЕ ЗУМИРОВАНИЕ
+
     void Display::horizontalZoom(bool up) {
         if (up) {
-            /// ОТДАЛЕНИЕ
+            // ОТДАЛЕНИЕ
 
             QLogValueAxis *rangeX = static_cast<QLogValueAxis *>(_graph->axisX());
 
@@ -249,9 +270,8 @@ namespace oscilloscope {
 
             _graph->axisX()->setMin(minX - step);
             _graph->axisX()->setMax(maxX + step);
-
         } else {
-            /// ПРИБЛИЖЕНИЕ
+            // ПРИБЛИЖЕНИЕ
 
             QLogValueAxis *rangeX = static_cast<QLogValueAxis *>(_graph->axisX());
 
@@ -263,11 +283,18 @@ namespace oscilloscope {
             _graph->axisX()->setMin(minX + step);
             _graph->axisX()->setMax(maxX - step);
         }
+
+        _dispalyMarkers.at(0)->update();
+        _dispalyMarkers.at(1)->update();
+
+        markersRecount();
     }
+
+    /// ВЕРТИКАЛЬНОЕ ЗУМИРОВАНИЕ
 
     void Display::verticalZoom(bool up) {
         if (up) {
-            /// ОТДАЛЕНИЕ
+            // ОТДАЛЕНИЕ
 
             QLogValueAxis *rangeY = static_cast<QLogValueAxis *>(_graph->axisY());
 
@@ -278,10 +305,8 @@ namespace oscilloscope {
 
             _graph->axisY()->setMin(minY - step);
             _graph->axisY()->setMax(maxY + step);
-
-            repaint();
         } else {
-            /// ПРИБЛИЖЕНИЕ
+            // ПРИБЛИЖЕНИЕ
 
             QLogValueAxis *rangeY = static_cast<QLogValueAxis *>(_graph->axisY());
 
@@ -291,11 +316,16 @@ namespace oscilloscope {
             double step = abs(maxY - minY) / 100;
 
             _graph->axisY()->setMin(minY + step);
-            _graph->axisY()->setMax(maxY - step);
-
-            repaint();
+            _graph->axisY()->setMax(maxY - step);   
         }
+
+        _dispalyMarkers.at(0)->update();
+        _dispalyMarkers.at(1)->update();
+
+        markersRecount();
     }
+
+    /// ПРИБЛИЖЕНИЕ ПО ОБОЗНАЧЕННОМУ ПРЯМОУГОЛЬНИКУ
 
     void Display::zoomRect(double minX, double maxX, double minY, double maxY) {
         if (maxX > minX) _graph->axisX()->setRange(minX, maxX);
@@ -304,17 +334,24 @@ namespace oscilloscope {
         if (maxY > minY) _graph->axisY()->setRange(minY, maxY);
             else _graph->axisY()->setRange(maxY, minY);
 
-        repaint();
+        _dispalyMarkers.at(0)->update();
+        _dispalyMarkers.at(1)->update();
+
+        markersRecount();
     }
+
+    /// ОЧИСТКА ГРАФИКА
 
     void Display::clear() {
         QList<QAbstractSeries *> list = _graph->series();
 
-        for (int i = 1; i < list.size(); i++)
+        for (int i = 3; i < list.size(); i++)
             _graph->removeSeries(list.at(i));
     }
 
-    void Display::addGraph(QLineSeries *series) {
+    /// ДОБАВЛЕНИЕ КАНАЛА
+
+    void Display::addGraph(QAbstractSeries *series) {
         deleteGraph(series->name());
 
         _graph->addSeries(series);
@@ -323,14 +360,18 @@ namespace oscilloscope {
         series->attachAxis(_graph->axisY());
     }
 
-    void Display::deleteGraph(QString name) {
+    /// УДАЛЕНИЕ КАНАЛА
+
+    void Display::deleteGraph(const QString &name) {
         QList<QAbstractSeries *> list = _graph->series();
 
         for (int i = 1; i < list.size(); i++)
             if (list.at(i)->name() == name) _graph->removeSeries(list.at(i));
     }
 
-    void Display::deleteDublicatesGraph(QString name) {
+    /// УДАЛЕНИЕ ДУБЛИКАТОВ ПО НАЗВАНИЮ ОРИГИНАЛА
+
+    void Display::deleteDublicatesGraph(const QString &name) {
         QList<QAbstractSeries *> list = _graph->series();
 
         for (int i = 1; i < list.size(); i++)
@@ -339,29 +380,38 @@ namespace oscilloscope {
                     _graph->removeSeries(list.at(i));
     }
 
+    /// ОБРАБОТКА СОБЫТИЙ НАЖАТИЯ КЛАВИШ
+
     void Display::keyPressEvent(QKeyEvent *event) {
         if (event->key() == Qt::Key_Alt)
             _keyAlt = true;
 
-        if (event->key() == Qt::Key_Control)
+        else if (event->key() == Qt::Key_Control)
             _keyCtrl = true;
 
-        if (event->key() == Qt::Key_Shift)
+        else if (event->key() == Qt::Key_Shift)
             _keyShift = true;
+
+        else if (event->key() == Qt::Key_Escape) {
+            _zoomRect = false;
+            _zoomArea->hide();
+        }
     }
+
+    /// ОБРАБОТКА СОБЫТИЙ ОТПУСКАНИЯ КЛАВИШ
 
     void Display::keyReleaseEvent(QKeyEvent *event) {
         if (event->key() == Qt::Key_Alt)
             _keyAlt = false;
 
-        if (event->key() == Qt::Key_Control) {
+        else if (event->key() == Qt::Key_Control) {
             _keyCtrl = false;
             _mouseGrab = false;
-        }
-
-        if (event->key() == Qt::Key_Shift)
+        } else if (event->key() == Qt::Key_Shift)
             _keyShift = false;
     }
+
+    /// СБРОС НАЖАТИЯ КЛАВИШ
 
     void Display::keysReset() {
         this->_keyAlt = false;
@@ -374,6 +424,123 @@ namespace oscilloscope {
         this->_zoomArea->hide();
         this->_mouseCord->hide();
     }
+
+    /// СОЗДАНИЕ МАРКЕРОВ
+
+    void Display::createMarker(double x) {
+        Marker *marker = new Marker(_graph, x);
+        _dispalyMarkers << marker;
+    }
+
+    /// ПЕРЕДВИЖЕНИЕ МАРКЕРОВ
+
+    void Display::moveMarker(double x) {
+        _dispalyMarkers[0]->setAnchor(x);
+
+        Marker *marker = _dispalyMarkers[0];
+
+        _dispalyMarkers[0] = _dispalyMarkers[1];
+        _dispalyMarkers[1] = marker;
+
+        markersRecount();
+    }
+
+    /// ПЕРЕРАСЧЕТ МАРКЕРОВ
+
+    void Display::markersRecount() {
+        if (_currentChannel) {
+            QVector<double> x = _currentChannel->data()->frame()->_offsetX;
+            QVector<std::complex<double>> y = _currentChannel->points();
+
+            _expectedValue =  MarkerMeasurements::expectedValue(x, y, _dispalyMarkers);
+            _standardDeviation =  MarkerMeasurements::standardDeviation(x, y, _dispalyMarkers, _expectedValue);
+            _capacity = MarkerMeasurements::signalCapacity(x, y, _dispalyMarkers);
+            _minAndMax = MarkerMeasurements::minAndMax(x, y, _dispalyMarkers);
+            _amplitude = MarkerMeasurements::signalAmplitude(_minAndMax);
+            _complexAmplitude = MarkerMeasurements::complexAmplitude(x, y, _dispalyMarkers);
+
+            emit markersRecounted();
+        }
+    }
+
+    /// ГЕТТЕР МАТ ОЖИДАНИЯ
+
+    std::complex<double> Display::expectedValue() const {
+        return _expectedValue;
+    }
+
+    /// ГЕТТЕР СКО
+
+    std::complex<double> Display::standardDeviation() const {
+        return _standardDeviation;
+    }
+
+    /// ГЕТТЕР МОЩНОСТИ
+
+    std::complex<double> Display::capacity() const {
+        return _capacity;
+    }
+
+    /// ГЕТТЕР АМПЛИТУДЫ
+
+    std::complex<double> Display::amplitude() const {
+        return _amplitude;
+    }
+
+    /// ГЕТТЕР КОМПЛЕКСНОЙ АМПЛИТУДЫ
+
+    double Display::complexAmplitude() const {
+        return _complexAmplitude;
+    }
+
+    /// ГЕТТЕР ТОЧЕК ЭКСТРЕМУМА
+
+    QVector<QPointF *> Display::minAndMax() const {
+        return _minAndMax;
+    }
+
+    /// СБРОС МАРКЕРОВ
+
+    void Display::resetMarkers() {
+        moveMarker(_graph->plotArea().x());
+        moveMarker(_graph->plotArea().width() + _graph->plotArea().x());
+
+        _dispalyMarkers.at(0)->hide();
+        _dispalyMarkers.at(1)->hide();
+    }
+
+    /// СКЕЙЛИНГ ПО ЦЕНТРУ
+
+    void Display::scaleByCenter() {
+        QList<QAbstractSeries *> list = _graph->series();
+
+        if (list.size() > 3) {
+            QLineSeries *line = static_cast<QLineSeries *>(list.at(3));
+            QVector<QPointF> points = line->pointsVector();
+
+            double minX = points.at(0).x(), maxX = points.at(0).x(), maxY = points.at(0).y(), minY = points.at(0).y();
+
+            for (int i = 3; i < list.size(); i++) {
+                line = static_cast<QLineSeries *>(list.at(i));
+                points = line->pointsVector();
+
+                for (int j = 0; j < points.size(); j++) {
+                    double x = points.at(j).x();
+                    double y = points.at(j).y();
+
+                    if (x > maxX) maxX = x;
+                    if (x < minX) minX = x;
+
+                    if (y > maxY) maxY = y;
+                    if (y < minY) minY = y;
+                }
+            }
+
+            zoomRect(minX, maxX, minY < 0 ? minY * 2 : minY / 2, maxY > 0 ? maxY * 2 : maxY / 2);
+        } else zoomRect(0, 100, -10, 10);
+    }
+
+    /// ДЕСТРУКТОР
 
     Display::~Display() {}
 }

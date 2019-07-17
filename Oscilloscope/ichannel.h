@@ -18,8 +18,10 @@ namespace oscilloscope {
         Q_OBJECT
     public:
         int channelType() const;
-        DataStream *dataStream() const;
-        QVector <std::complex<double>> points() const;
+        DataStream *data() const;
+
+        QVector<std::complex<double>> points() const;
+        QVector<double> offsetX() const;
 
         void trigger(Enums::TriggersType type = Enums::TriggersType::WithoutTriggers, double level = 0.0);
         void transform(Enums::TransformateType type = Enums::TransformateType::None, double expSmthCoef = 0.0, int movingAvgCoef = 0);
@@ -27,10 +29,11 @@ namespace oscilloscope {
         ~iChannel();
 
     private:
-        QVector <std::complex<double>> _points;
+        QVector<std::complex<double>> _points;
+        QVector<double> _offsetX;
 
     protected:
-        explicit iChannel(DataStream *dataStream);
+        explicit iChannel(DataStream *data);
         iChannel(const iChannel *channel);
 
         int _channelType;
@@ -39,7 +42,7 @@ namespace oscilloscope {
 
     /// ПРЕОБРАЗОВАНИЯ
 
-    QVector<std::complex<double>> bpf(const QVector<std::complex<double>> &points);
+    QVector<QVector<std::complex<double>>> bpf(const QVector<std::complex<double>> &points, const QVector<double> &x, double step);
     QVector<std::complex<double>> threePointFilter(const QVector<std::complex<double>> &points);
     QVector<std::complex<double>> expSmoothing(const QVector<std::complex<double>> &points, double coef);
     QVector<std::complex<double>> movingAvg(const QVector<std::complex<double>> &points, int coef);

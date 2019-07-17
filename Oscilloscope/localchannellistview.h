@@ -23,20 +23,20 @@ namespace oscilloscope {
         explicit LocalChannelListView(QWidget *parent = 0);
 
         Attributes *attribute(int index) const;
-        QListWidgetItem *itemByName(QString name) const;
-        QListWidgetItem *itemDublicateByName(QString name) const;
+        QListWidgetItem *itemByName(const QString &name) const;
+        QListWidgetItem *itemDublicateByName(const QString &name) const;
 
-        void addChannel(QString name);
-        void deleteChannel(const QString name);
-        void deleteDublicates(const QString name);
+        void addChannel(const QString &name);
+        void deleteChannel(const QString &name);
+        void deleteDublicates(const QString &name);
         void deleteAttribute(int index);
 
         ~LocalChannelListView();
 
     protected:
-        void dragMoveEvent(QDragMoveEvent* event);
-        void dropEvent(QDropEvent* event);
-        void dragEnterEvent(QDragEnterEvent* event);
+        void dragMoveEvent(QDragMoveEvent *event);
+        void dropEvent(QDropEvent *event);
+        void dragEnterEvent(QDragEnterEvent *event);
 
         void itemDelete(QListWidgetItem *item);
 

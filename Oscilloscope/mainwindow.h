@@ -30,10 +30,8 @@ namespace oscilloscope {
         void on_createSimpleScope_pressed();
         void deleteScope();
 
-        void channelDelete(const QString name);
-        void channelUpdate(QString name);
-
-        void changeServerSettings();
+        void channelDelete(const QString &name);
+        void channelUpdate(const QString &name);
 
         void startRecord();
         void stopRecord();
@@ -42,7 +40,10 @@ namespace oscilloscope {
         void stopPlayingRecord();
         void changeRecordSpeedSettings();
 
-        void showErrorMessage(QString errorMessage);
+        void showErrorMessage(const QString &errorMessage);
+
+        void changeServerSettings();
+        void updateRecordMenu();
 
     private:
         Ui::MainWindow *ui;
@@ -50,12 +51,14 @@ namespace oscilloscope {
         QList<SimpleScope *> _scopes;
         GlobalChannelList *_channels;
         ChannelController *_channelController;
+        QListWidgetItem *_recordItem;
+
+        int countScopes;
 
         QVector<RecordFrameParser *> _recordFrameParsers;
-        QMenu *_menu;
-        QAction *_serverAct;
 
         QMenu *_recordMenu;
+
         QAction *_startRecordAct;
         QAction *_stopRecordAct;
         QAction *_loadAct;
@@ -64,8 +67,7 @@ namespace oscilloscope {
 
         QAction *_speedRecordMenu;
 
-        Recorder* _recorder;
-        int countScopes;
+        Recorder *_recorder;
 
     protected:
         bool eventFilter(QObject *object, QEvent *event);

@@ -29,8 +29,9 @@ namespace oscilloscope {
 
         LocalChannelList *localList() const;
 
-        int colorIndex(QColor color) const;
-        QColor colorByIndex(int index) const;
+        int colorIndex(const QColor &color) const;
+        const QColor colorByIndex(int index) const;
+        bool pause() const;
 
         ~SimpleScope();
 
@@ -39,10 +40,15 @@ namespace oscilloscope {
 
         GlobalChannelList *_globalList;
         LocalChannelList *_channels;
+        bool _stop;
 
         Display *_display;
 
-        std::tuple<iChannel *, Attributes *, bool> findChannel(QString name);
+        QAction *_pauseAct;
+
+        std::tuple<iChannel *, Attributes *, bool> findChannel(const QString &name);
+
+        QMenuBar *_bar;
 
     protected:
         void paintEvent(QPaintEvent *);
@@ -50,18 +56,22 @@ namespace oscilloscope {
 
     private slots:
         void on_createDublicate_pressed();
+        void updateTitle();
+        void setPause();
 
     public slots:
         void channelUpdate(std::tuple<iChannel *, Attributes *, bool> _tuple, QString name);
 
         void itemChecked(QObject *);
 
-        void recount(QString name);
-        void recountDublicates(QString name);
+        void recount(const QString &name);
+        void recountDublicates(const QString &name);
 
-        void deleteChannel(QString name);
-        void deleteDublicates(QString name);
+        void deleteChannel(const QString &name);
+        void deleteDublicates(const QString &name);
 
+        void markersRecounted();
+        void minMaxUpdate();
     };
 }
 

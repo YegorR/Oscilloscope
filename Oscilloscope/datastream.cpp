@@ -10,7 +10,8 @@ namespace oscilloscope {
     /// ОБНОВЛЕНИЕ КАДРА
 
     void DataStream::update(Frame *frame) {
-      emit receivedFrame(frame);
+        emit receivedFrame(frame);
+
         if (_frame != nullptr)
             delete _frame;
 
@@ -20,7 +21,8 @@ namespace oscilloscope {
     }
 
     void DataStream::insert(Frame *frame) {
-      emit receivedFrame(frame);
+        emit receivedFrame(frame);
+
         for (int i = 0; i < _frame->_points.length(); i++) {
             if (_frame->_offsetX.at(i) >= frame->_offsetX.at(0)) {
                 for (int j = i, k = 0; k < frame->_points.length(); j++, k++) {

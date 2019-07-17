@@ -12,12 +12,11 @@ namespace oscilloscope {
         ui = new Ui::MainWindow;
         ui->setupUi(this);
 
+        // СОЗДАНИЕ ОБЪЕКТОВ
+
         _channels = new GlobalChannelList(ui->verticalLayout);
         _channelController = new ChannelController(_channels);
-
-        connect(_channels, SIGNAL(channelDeleted(QString)), this, SLOT(channelDelete(QString)));
-        connect(_channels, SIGNAL(channelUpdated(QString)), this, SLOT(channelUpdate(QString)));
-        connect(_channelController, SIGNAL(channelUpdated(QString)), this, SLOT(channelUpdate(QString)));
+        _recordItem = nullptr;
 
         this->show();
         this->move(this->x() - this->x() / 2, this->y());
@@ -26,129 +25,166 @@ namespace oscilloscope {
 
         on_createSimpleScope_pressed();
 
-        _menu = menuBar()->addMenu("Файл");
+        // СОЗДАНИЕ МЕНЮ БАРА
 
-        _serverAct = new QAction("Параметры сервера", this);
-        connect(_serverAct, SIGNAL(triggered()), this, SLOT(changeServerSettings()));
-        _menu->addAction(_serverAct);
+        QMenu *menu = menuBar()->addMenu("Файл");
 
-        _recordMenu = _menu->addMenu("Запись");
+        QAction *serverAct = new QAction("Параметры сервера", this);
+        connect(serverAct, SIGNAL(triggered()), this, SLOT(changeServerSettings()));
+        menu->addAction(serverAct);
+
+        _recordMenu = menu->addMenu("Запись");
+
         _startRecordAct = new QAction("Начать запись", this);
         connect(_startRecordAct, SIGNAL(triggered()), this, SLOT(startRecord()));
+        _startRecordAct->setEnabled(false);
+
         _stopRecordAct = new QAction("Остановить запись", this);
         connect(_stopRecordAct, SIGNAL(triggered()), this, SLOT(stopRecord()));
         _stopRecordAct->setEnabled(false);
+
         _loadAct = new QAction("Загрузить запись", this);
         connect(_loadAct, SIGNAL(triggered()), this, SLOT(loadRecord()));
+
         _playAct = new QAction("Воспроизвести");
         connect(_playAct, SIGNAL(triggered()), this, SLOT(playRecord()));
+        _playAct->setEnabled(false);
+
         _stopAct = new QAction("Стоп");
         connect(_stopAct, SIGNAL(triggered()), this, SLOT(stopPlayingRecord()));
+        _stopAct->setEnabled(false);
+
         _speedRecordMenu = new QAction("Скорость воспроизведения");
         connect(_speedRecordMenu, SIGNAL(triggered()), this, SLOT(changeRecordSpeedSettings()));
+        _speedRecordMenu->setEnabled(false);
 
         _recordMenu->addAction(_startRecordAct);
         _recordMenu->addAction(_stopRecordAct);
+
         _recordMenu->addSeparator();
+
         _recordMenu->addAction(_loadAct);
         _recordMenu->addAction(_playAct);
         _recordMenu->addAction(_stopAct);
         _recordMenu->addAction(_speedRecordMenu);
 
+        // СОЕДИНЕНИЕ СЛОТОВ И СИГНАЛОВ
+
+        connect(_channels, SIGNAL(channelDeleted(QString)), this, SLOT(channelDelete(QString)));
+        connect(_channels, SIGNAL(channelUpdated(QString)), this, SLOT(channelUpdate(QString)));
+        connect(_channelController, SIGNAL(channelUpdated(QString)), this, SLOT(channelUpdate(QString)));
+        connect(_channels, SIGNAL(currentItemChanged(QListWidgetItem *,QListWidgetItem *)), this, SLOT(updateRecordMenu()));
+
         this->installEventFilter(this);
     }
 
+    /// НАЧАТЬ ЗАПИСЬ
+
     void MainWindow::startRecord() {
-      iChannel *item = _channels->getSelectedChannel();
-      if (item == nullptr) {
-          return;
-        }
+        iChannel *item = _channels->getSelectedChannel();
+        if (item == nullptr) return;
 
-      _startRecordAct->setEnabled(false);
-      _stopRecordAct->setEnabled(true);
+        _recordItem = _channels->getSelectedItem();
+        _recordItem->setIcon(QIcon(":/new/icons/record_icon"));
 
-      _recorder = new Recorder(item->dataStream());
-      connect(_recorder, SIGNAL(error(QString)), this, SLOT(showErrorMessage(QString)));
-      _recorder->startRecord();
+        _startRecordAct->setEnabled(false);
+        _stopRecordAct->setEnabled(true);
+
+        _recorder = new Recorder(item->data());
+        connect(_recorder, SIGNAL(error(QString)), this, SLOT(showErrorMessage(QString)));
+        _recorder->startRecord();
     }
+
+    /// ОСТАНОВИТЬ ЗАПИСЬ
 
     void MainWindow::stopRecord() {
-      _startRecordAct->setEnabled(true);
-      _stopRecordAct->setEnabled(false);
-      _recorder->stopRecord();
-      QString filename = QFileDialog::getSaveFileName(this, "Сохранение записи", QString(),
-                                                      "Record (*.rcd)");
-      if (!filename.isEmpty()) {
-          _recorder->saveRecord(filename);
-        }
+        if (_recordItem) _recordItem->setIcon(QIcon());
+        _recordItem = nullptr;
 
-      delete _recorder;
-      _recorder = nullptr;
+        _startRecordAct->setEnabled(true);
+        _stopRecordAct->setEnabled(false);
+
+        _recorder->stopRecord();
+
+        QString filename = QFileDialog::getSaveFileName(this, "Сохранение записи", QString(), "Record (*.rcd)");
+        if (!filename.isEmpty()) _recorder->saveRecord(filename);
+
+        delete _recorder;
+        _recorder = nullptr;
     }
+
+    /// ЗАГРУЗКА ЗАПИСИ
 
     void MainWindow::loadRecord() {
-      QString filename = QFileDialog::getOpenFileName(this, "Открыть запись", QString(),
-                                                      "Record (*.rcd)");
-      if (filename.isEmpty()) {
-          return;
+        QString filename = QFileDialog::getOpenFileName(this, "Открыть запись", QString(), "Record (*.rcd)");
+        if (filename.isEmpty()) return;
+
+        RecordFrameParser *recordFrameParser = new RecordFrameParser(filename, this);
+        connect(recordFrameParser, SIGNAL(error(QString)), this, SLOT(showErrorMessage(QString)));
+
+        if (!recordFrameParser->init()) {
+            delete recordFrameParser;
+            return;
         }
-      RecordFrameParser* recordFrameParser = new RecordFrameParser(filename, this);
-      connect(recordFrameParser, SIGNAL(error(QString)), this, SLOT(showErrorMessage(QString)));
-      if (!recordFrameParser->init()) {
-          delete recordFrameParser;
-          return;
-        }
-      _recordFrameParsers.push_back(recordFrameParser);
-      _channelController->addRecordFrameParser(recordFrameParser);
+
+        _recordFrameParsers.push_back(recordFrameParser);
+        _channelController->addRecordFrameParser(recordFrameParser);
     }
 
+    /// ВОСПРОИЗВЕДЕНИЕ ЗАПИСИ
+
     void MainWindow::playRecord() {
-      iChannel *item = _channels->getSelectedChannel();
-      if (item == nullptr) {
-          return;
-        }
-      QString channelName = item->dataStream()->frame()->_channelName;
-      for(int i = 0; i < _recordFrameParsers.size(); ++i) {
-          if (_recordFrameParsers.at(i)->channelName() == channelName) {
-              RecordFrameParser* parser =  _recordFrameParsers.at(i);
-              parser->stop();
-              parser->start();
-              return;
+        iChannel *item = _channels->getSelectedChannel();
+        if (item == nullptr) return;
+
+        QString channelName = item->data()->frame()->_channelName;
+
+        for(int i = 0; i < _recordFrameParsers.size(); ++i) {
+            if (_recordFrameParsers.at(i)->channelName() == channelName) {
+                RecordFrameParser *parser =  _recordFrameParsers.at(i);
+
+                parser->stop();
+                parser->start();
+
+                return;
             }
         }
     }
 
+    /// ПАУЗА ВОСРОИЗВЕДЕННОЙ ЗАПИСИ
+
     void MainWindow::stopPlayingRecord() {
-      iChannel *item = _channels->getSelectedChannel();
-      if (item == nullptr) {
-          return;
-        }
-        QString channelName = item->dataStream()->frame()->_channelName;
+        iChannel *item = _channels->getSelectedChannel();
+        if (item == nullptr) return;
+        QString channelName = item->data()->frame()->_channelName;
+
         for(int i = 0; i < _recordFrameParsers.size(); ++i) {
             if (_recordFrameParsers.at(i)->channelName() == channelName) {
                 RecordFrameParser* parser =  _recordFrameParsers.at(i);
                 parser->stop();
                 return;
-               }
             }
+        }
     }
+
+    /// СОЗДАНИЯ ОКНА С НАСТРОЙКАМИ ВОСПРОИЗВЕДЕНИЯ ЗАПИСИ
 
     void MainWindow::changeRecordSpeedSettings() {
-      iChannel *item = _channels->getSelectedChannel();
-      if (item == nullptr) {
-          return;
-        }
-        QString channelName = item->dataStream()->frame()->_channelName;
-        for(int i = 0; i < _recordFrameParsers.size(); ++i) {
+        iChannel *item = _channels->getSelectedChannel();
+        if (item == nullptr) return;
+
+        QString channelName = item->data()->frame()->_channelName;
+
+        for (int i = 0; i < _recordFrameParsers.size(); ++i) {
             if (_recordFrameParsers.at(i)->channelName() == channelName) {
-                RecordFrameParser* parser =  _recordFrameParsers.at(i);
+                RecordFrameParser *parser =  _recordFrameParsers.at(i);
                 PlayRecordSpeedDialog dialog(parser, this);
                 dialog.exec();
-                return;
-               }
-            }
-    }
 
+                return;
+            }
+        }
+    }
 
     /// ОБНОВЛЕНИЕ СПИСКА ДИСПЛЕЕВ ПРИ ЗАКРЫТИЕ ОДНОГО ИЗ НИХ
 
@@ -175,20 +211,31 @@ namespace oscilloscope {
         countScopes++;
     }
 
-    /// ОБРАБОТКА ОБНОВЛЕНИЯ КАНААЛОВ
+    /// ОБРАБОТКА ОБНОВЛЕНИЯ КАНАЛОВ
 
-    void MainWindow::channelUpdate(QString name) {
+    void MainWindow::channelUpdate(const QString &name) {
         for (int i = 0; i < _scopes.length(); i++) {
-            _scopes.at(i)->repaint();
+            if (!_scopes.at(i)->pause()) {
+                _scopes.at(i)->repaint();
 
-            _scopes.at(i)->recount(name);
-            _scopes.at(i)->recountDublicates(name);
+                _scopes.at(i)->recount(name);
+                _scopes.at(i)->recountDublicates(name);
+            }
         }
     }
 
     /// ОБРАБОТКА УДАЛЕНИЯ ОРИГИНАЛЬНОГО КАНАЛА
 
-    void MainWindow::channelDelete(const QString name) {
+    void MainWindow::channelDelete(const QString &name) {
+        if (_recordItem && _recordItem->text() == name) stopRecord();
+
+        for (int i = 0; i < _recordFrameParsers.size(); i++) {
+            if (_recordFrameParsers.at(i)->channelName() == name) {
+                _recordFrameParsers.removeAt(i);
+                break;
+            }
+        }
+
         for (int i = 0; i < _scopes.length(); i++) {
             SimpleScope *scope = _scopes.at(i);
 
@@ -204,6 +251,42 @@ namespace oscilloscope {
         }
     }
 
+    /// ОБНОВЛЕНИЕ МЕНЮ ЗАПИСЕЙ
+
+    void MainWindow::updateRecordMenu() {
+        iChannel *item = _channels->getSelectedChannel();
+        if (item == nullptr) {
+            _startRecordAct->setEnabled(false);
+            _stopRecordAct->setEnabled(false);
+            _playAct->setEnabled(false);
+            _stopAct->setEnabled(false);
+            _speedRecordMenu->setEnabled(false);
+
+            return;
+        }
+
+        QString channelName = item->data()->frame()->_channelName;
+
+        for (int i = 0; i < _recordFrameParsers.size(); ++i) {
+            if (_recordFrameParsers.at(i)->channelName() == channelName) {
+                _startRecordAct->setEnabled(false);
+                _playAct->setEnabled(true);
+                _stopAct->setEnabled(true);
+                _speedRecordMenu->setEnabled(true);
+
+                return;
+            }
+        }
+
+        if (!_recordItem) _startRecordAct->setEnabled(true);
+
+        _playAct->setEnabled(false);
+        _stopAct->setEnabled(false);
+        _speedRecordMenu->setEnabled(false);
+    }
+
+    /// СОЗДАНИЕ ОКНА НАСТРОЕК СЕРВЕРА
+
     void MainWindow::changeServerSettings() {
           ServerSettings dialog(this);
 
@@ -213,12 +296,7 @@ namespace oscilloscope {
           dialog.exec();
     }
 
-    void MainWindow::showErrorMessage(QString errorMessage) {
-      QMessageBox errorMessageBox(this);
-      errorMessageBox.setText(errorMessage);
-      errorMessageBox.setWindowTitle("Ошибка");
-      errorMessageBox.exec();
-    }
+    /// ФИЛЬТР СОБЫТИЙ
 
     bool MainWindow::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::Close) {
@@ -229,6 +307,17 @@ namespace oscilloscope {
         }
 
         return false;
+    }
+
+    /// ВЫВОД СООБЩЕНИЯ ОБ ОШИБКЕ
+
+    void MainWindow::showErrorMessage(const QString &errorMessage) {
+        QMessageBox errorMessageBox(this);
+
+        errorMessageBox.setText(errorMessage);
+        errorMessageBox.setWindowTitle("Ошибка");
+
+        errorMessageBox.exec();
     }
 
     /// ДЕСТРУКТОР

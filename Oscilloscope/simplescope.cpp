@@ -13,16 +13,27 @@ namespace oscilloscope {
         ui->setupUi(this);
 
         _globalList = globalList;
+        _stop = false;
+
+        // СОЗДАНИЕ ОБЪЕКТОВ
 
         _channels = new LocalChannelList(ui->channelsLayout);
 
-        connect(_channels, SIGNAL(itemChecked(QObject*)), this, SLOT(itemChecked(QObject *)));
-        connect(_channels, SIGNAL(channelDeleted(QString)), this, SLOT(deleteChannel(QString)));
+        _display = new Display();
+        ui->verticalLayout_3->insertWidget(0, _display);
+        ui->verticalLayout_3->setStretch(0, 3);
+        ui->verticalLayout_3->setStretch(1, 1);
+
+        // УСТАНОВКА ЗНАЧЕНИЙ ПОУМОЛЧАНИЮ ОБЪЕКТАМ
 
         ui->DisplayName->setText(name);
-        setAttribute(Qt::WA_DeleteOnClose, true);
+        setWindowTitle(ui->DisplayName->text());
 
         ui->channelController->hide();
+
+        ui->TriggerLevel->setEnabled(false);
+        ui->TransformSpins->setEnabled(false);
+        ui->TransformSpinDouble->hide();
 
         QMetaEnum metaEnum = QMetaEnum::fromType<Enums::Colors>();
 
@@ -41,14 +52,60 @@ namespace oscilloscope {
         for (int i = 0; i < TRIGGERS_COUNT; i++)
             ui->TriggerType->addItem(metaEnum.key(i));
 
-        _display = new Display();
-        ui->DisplayLayout->insertWidget(0, _display);
+        // СОЗДАНИЕ МЕНЮ БАРА
 
-        ui->TriggerLevel->setEnabled(false);
-        ui->TransformSpins->setEnabled(false);
-        ui->TransformSpinDouble->hide();
+        _bar = new QMenuBar(this);
+
+        QMenu *menu = new QMenu();
+        menu->setTitle("Вид");
+
+        QAction *viewAct = new QAction("Сбросить маркеры", this);
+        viewAct->setShortcut(Qt::Key_R);
+        connect(viewAct, SIGNAL(triggered()), _display, SLOT(resetMarkers()));
+        menu->addAction(viewAct);
+
+        viewAct = new QAction("Сбросить вид", this);
+
+        QList<QKeySequence> shortcuts;
+        shortcuts.push_back(Qt::MiddleButton);
+        shortcuts.push_back(Qt::Key_Tab);
+
+        viewAct->setShortcuts(shortcuts);
+        connect(viewAct, SIGNAL(triggered()), _display, SLOT(scaleByCenter()));
+        menu->addAction(viewAct);
+
+        _pauseAct = new QAction("Остановить обновления", this);
+        _pauseAct->setShortcut(Qt::Key_Space);
+        connect(_pauseAct, SIGNAL(triggered(bool)), this, SLOT(setPause()));
+        menu->addAction(_pauseAct);
+
+        _bar->addMenu(menu);
+        _bar->show();
+
+        // СОЕДИНЕНИЕ СИГНАЛОВ И СЛОТОВ
+
+        connect(_channels, SIGNAL(itemChecked(QObject *)), this, SLOT(itemChecked(QObject *)));
+        connect(_channels, SIGNAL(channelDeleted(QString)), this, SLOT(deleteChannel(QString)));
+
+        connect(ui->ShowImg, SIGNAL(stateChanged(int)), this, SLOT(repaint()));
+        connect(ui->ShowReal, SIGNAL(stateChanged(int)), this, SLOT(repaint()));
+
+        connect(ui->TriggerLevel, SIGNAL(valueChanged(double)), this, SLOT(repaint()));
+
+        connect(ui->TransformSpinDouble, SIGNAL(valueChanged(double)), this, SLOT(repaint()));
+        connect(ui->TransformSpinInt, SIGNAL(valueChanged(int)), this, SLOT(repaint()));
+
+        connect(ui->RealMaxPaint, SIGNAL(stateChanged(int)), this, SLOT(minMaxUpdate()));
+        connect(ui->RealMinPaint, SIGNAL(stateChanged(int)), this, SLOT(minMaxUpdate()));
+        connect(ui->ImagMaxPaint, SIGNAL(stateChanged(int)), this, SLOT(minMaxUpdate()));
+        connect(ui->ImagMinPaint, SIGNAL(stateChanged(int)), this, SLOT(minMaxUpdate()));
+
+        connect(_display, SIGNAL(markersRecounted()), this, SLOT(markersRecounted()));
+
+        connect(ui->DisplayName, SIGNAL(textChanged(QString)), this, SLOT(updateTitle()));
 
         this->installEventFilter(this);
+        setAttribute(Qt::WA_DeleteOnClose, true);
     }
 
     /// ОТРИСОВКА
@@ -57,7 +114,7 @@ namespace oscilloscope {
         LocalChannelListView * channelsView = _channels->channelsView();
         QCheckBox *channel = dynamic_cast<QCheckBox *>(channelsView->itemWidget(channelsView->currentItem()));
 
-        /// Получение и изменение атрибутов отрисовки
+        // ПОЛУЧЕНИЕ И ИЗМЕНЕНИЕ АТРИБУТОВ КАНАЛОВ
 
         if (channel) {
             iChannel *ch;
@@ -71,9 +128,17 @@ namespace oscilloscope {
             Attributes *atr = channelsView->attribute(channelsView->currentRow());
             QMetaEnum metaEnum = QMetaEnum::fromType<Enums::TransformateType>();
 
-            /// ОБНОВЛЕНИЕ ВЫВОДА ТЕКУЩИХ АТРИБУТОВ
+            if (ui->channelName->text() != channel->text()) {     
+                // ОБНОВЛЕНИЕ ВЫВОДА ТЕКУЩИХ АТРИБУТОВ
 
-            if (ui->channelName->text() != channel->text()) {
+                disconnect(ui->ShowImg, SIGNAL(stateChanged(int)), this, SLOT(repaint()));
+                disconnect(ui->ShowReal, SIGNAL(stateChanged(int)), this, SLOT(repaint()));
+
+                disconnect(ui->TriggerLevel, SIGNAL(valueChanged(double)), this, SLOT(repaint()));
+
+                disconnect(ui->TransformSpinDouble, SIGNAL(valueChanged(double)), this, SLOT(repaint()));
+                disconnect(ui->TransformSpinInt, SIGNAL(valueChanged(int)), this, SLOT(repaint()));
+
                 ui->channelName->setText(channel->text());
                 ui->channelController->show();
 
@@ -93,8 +158,18 @@ namespace oscilloscope {
 
                 ui->ShowReal->setChecked(atr->_showReal);
                 ui->ShowImg->setChecked(atr->_showImag);
+
+                _display->setCurrentChannel(ch);
+
+                connect(ui->ShowImg, SIGNAL(stateChanged(int)), this, SLOT(repaint()));
+                connect(ui->ShowReal, SIGNAL(stateChanged(int)), this, SLOT(repaint()));
+
+                connect(ui->TriggerLevel, SIGNAL(valueChanged(double)), this, SLOT(repaint()));
+
+                connect(ui->TransformSpinDouble, SIGNAL(valueChanged(double)), this, SLOT(repaint()));
+                connect(ui->TransformSpinInt, SIGNAL(valueChanged(int)), this, SLOT(repaint()));
             } else {
-                /// ИЗМЕНЕНИЕ АТРИБУТОВ
+                // ИЗМЕНЕНИЕ АТРИБУТОВ В СООТВЕТСТВИИ С ИХ ВЫВОДОМ
 
                 QColor colorReal = colorByIndex(ui->ColorReal->currentIndex());
                 QColor colorImg = colorByIndex(ui->ColorImg->currentIndex());
@@ -114,52 +189,62 @@ namespace oscilloscope {
 
                 if (colorReal != atr->_colorReal) {
                     atr->_colorReal = colorReal;
+
                     channelUpdate(findChannel(channel->text()), channel->text());
                 }
+
                 if (colorImg != atr->_colorImg) {
                     atr->_colorImg = colorImg;
+
                     channelUpdate(findChannel(channel->text()), channel->text());
                 }
 
                 if (transformateType != atr->_transformateType) {
                     atr->_transformateType =  static_cast<Enums::TransformateType>(transformateType);
+
                     recount(channel->text());
                 }
 
                 if (triggerType != atr->_triggerType) {
                     atr->_triggerType =  static_cast<Enums::TriggersType>(triggerType);
+
                     recount(channel->text());
                 }
 
                 if (ui->TriggerLevel->isEnabled() && atr->_triggerLevel != ui->TriggerLevel->value()) {
                     atr->_triggerLevel = ui->TriggerLevel->value();
+
                     recount(channel->text());
                 }
 
                 if (ui->TransformSpinInt->isEnabled() && !ui->TransformSpinInt->isHidden() && atr->_moveAvgCoef != ui->TransformSpinInt->value()) {
                     atr->_moveAvgCoef = ui->TransformSpinInt->value();
+
                     recount(channel->text());
                 }
 
                 if (ui->TransformSpinDouble->isEnabled() && !ui->TransformSpinDouble->isHidden() && atr->_expSmthCoef != ui->TransformSpinDouble->value()) {
                     atr->_expSmthCoef = ui->TransformSpinDouble->value();
+
                     recount(channel->text());
                 }
 
                 if (ui->ShowReal->isChecked() != atr->_showReal) {
                     atr->_showReal = ui->ShowReal->isChecked();
+
                     channelUpdate(findChannel(channel->text()), channel->text());
                 }
 
                 if (ui->ShowImg->isChecked() != atr->_showImag) {
                     atr->_showImag = ui->ShowImg->isChecked();
+
                     channelUpdate(findChannel(channel->text()), channel->text());
                 }
             }
 
-            /// ПРОВЕРКА НА КОМПЛЕКСНОЕ ЧИСЛО
+            // ПРОВЕРКА НА КОМПЛЕКСНОЕ ЧИСЛО
 
-            if (ch->dataStream()->frame()->_isComplex) {
+            if (ch->data()->frame()->_isComplex) {
                 ui->ImgLayout->setEnabled(true);
                 ui->ShowReal->setEnabled(true);;
             } else {
@@ -169,7 +254,7 @@ namespace oscilloscope {
                 ui->ShowReal->setChecked(true);
             }
 
-            /// ПРОВЕРКА МЕТОДА ПРЕОБРАЗОВАНИЯ
+            // ПРОВЕРКА МЕТОДА ПРЕОБРАЗОВАНИЯ
 
             if (atr->_transformateType == Enums::TransformateType::ExponentialSmoothing) {
                 ui->TransformSpins->setEnabled(true);
@@ -185,25 +270,35 @@ namespace oscilloscope {
 
             ui->TriggerLevel->setEnabled(atr->_triggerType != Enums::TriggersType::WithoutTriggers);
         } else {
+            _display->setCurrentChannel(nullptr);
+
             ui->channelName->setText("Канал не выбран");
             ui->channelController->hide();
         }
     }
 
+    /// СЛОТ ОБРАБОТКИ СИГНАЛА ЧЕКБОКСОВ В ЛОКАЛЬНОМ СПИСКЕ КАНАЛОВ
+
     void SimpleScope::itemChecked(QObject *object) {
         QCheckBox *channel = dynamic_cast<QCheckBox *>(object);
+
         if (channel->isChecked()) recount(channel->text());
-            else deleteChannel(channel->text());
+            else {
+                deleteChannel(channel->text());
+                minMaxUpdate();
+            }
     }
 
-    std::tuple<iChannel *, Attributes *, bool> SimpleScope::findChannel(QString name) {
+    /// ПОИСК КАНАЛА С ЕГО АТРИБУТАМИ И ЕГО СТАТУСОМ ПО ЕГО ИМЕНИ
+
+    std::tuple<iChannel *, Attributes *, bool> SimpleScope::findChannel(const QString &_name) {
         LocalChannelListView * channelsView = _channels->channelsView();
         QCheckBox *channel;
 
         for (int i = 0; i < channelsView->count(); i++) {
             channel = dynamic_cast<QCheckBox *>(channelsView->itemWidget(channelsView->item(i)));
 
-            if (channel->text() == name) {
+            if (channel->text() == _name) {
                 if (channel->isChecked()) {
                     Attributes *atr = localList()->channelsView()->attribute(i);
 
@@ -215,7 +310,7 @@ namespace oscilloscope {
                         index = _channels->indexByName(channel->text());
                         ch = _channels->channels()->at(index);
 
-                        name = ch->dataStream()->frame()->_channelName;
+                        QString name = ch->data()->frame()->_channelName;
                         index = _globalList->indexByName(name);
                         Channel *temp = dynamic_cast<Channel *>(_globalList->channels()->at(index));
 
@@ -237,6 +332,8 @@ namespace oscilloscope {
         return std::tuple<iChannel *, Attributes *, bool>(nullptr, nullptr, false);
     }
 
+    /// ОБНОВЛЕНИЕ ВЫВОДА КАНАЛА
+
     void SimpleScope::channelUpdate(std::tuple<iChannel *, Attributes *, bool> _tuple, QString name) {
         iChannel *channel = std::get<0>(_tuple);
 
@@ -245,10 +342,10 @@ namespace oscilloscope {
             bool alive = std::get<2>(_tuple);
 
             QVector<std::complex<double>> points = channel->points();
-            QVector<double> offsetX = channel->dataStream()->frame()->_offsetX;
+            QVector<double> offsetX = channel->offsetX();
 
             if (points.count() > 0) {
-                /// ОТРИСОВКА ДЕЙСТВИТЕЛЬНОЙ ЧАСТИ
+                // ОТРИСОВКА ДЕЙСТВИТЕЛЬНОЙ ЧАСТИ
 
                 if (atr->_showReal) {
                     QLineSeries *series = new QLineSeries();
@@ -268,9 +365,9 @@ namespace oscilloscope {
                     _display->addGraph(series);
                 } else _display->deleteGraph(name);
 
-                /// ОТРИСОВКА МНИМОЙ ЧАСТИ
+                // ОТРИСОВКА МНИМОЙ ЧАСТИ
 
-                if (atr->_showImag && channel->dataStream()->frame()->_isComplex) {
+                if (atr->_showImag && channel->data()->frame()->_isComplex) {
                     QLineSeries *series = new QLineSeries();
                     series->setName(name + "IMAG");
 
@@ -289,9 +386,13 @@ namespace oscilloscope {
                 } else _display->deleteGraph(name + "IMAG");
             }
         }
+
+        minMaxUpdate();
     }
 
-    void SimpleScope::recount(QString name) {
+    /// ПЕРЕСЧЕТ ТОЧЕК ГРАФИКА КАНАЛА
+
+    void SimpleScope::recount(const QString &name) {
         std::tuple<iChannel *, Attributes *, bool> _tuple = findChannel(name);
 
         iChannel *channel = std::get<0>(_tuple);
@@ -303,17 +404,21 @@ namespace oscilloscope {
             channel->transform(atr->_transformateType, atr->_expSmthCoef, atr->_moveAvgCoef);
 
             channelUpdate(_tuple, name);
+
+            _display->markersRecount();
         }
     }
 
-    void SimpleScope::recountDublicates(QString name) {
+    /// ПЕРЕСЧЕТ ТОЧЕК ГРАФИКА ДУБЛИКАТОВ КАНАЛА ПО ИМЕНИ ОРИГАНАЛА
+
+    void SimpleScope::recountDublicates(const QString &_name) {
         LocalChannelListView * channelsView = _channels->channelsView();
         QCheckBox *channel;
 
         for (int i = 0; i < channelsView->count(); i++) {
             channel = dynamic_cast<QCheckBox *>(channelsView->itemWidget(channelsView->item(i)));
 
-            if (channel->text().contains(DUBLICATE_NAME_BY_PARENT(name), Qt::CaseInsensitive) && channel->isChecked()) {
+            if (channel->text().contains(DUBLICATE_NAME_BY_PARENT(_name), Qt::CaseInsensitive) && channel->isChecked()) {
                 Attributes *atr = localList()->channelsView()->attribute(i);
 
                 iChannel *ch;
@@ -322,7 +427,7 @@ namespace oscilloscope {
                 int index = _channels->indexByName(channel->text());
                 ch = _channels->channels()->at(index);
 
-                name = ch->dataStream()->frame()->_channelName;
+                QString name = ch->data()->frame()->_channelName;
                 index = _globalList->indexByName(name);
 
                 Channel *temp = dynamic_cast<Channel *>(_globalList->channels()->at(index));
@@ -332,6 +437,8 @@ namespace oscilloscope {
                 ch->transform(atr->_transformateType, atr->_expSmthCoef, atr->_moveAvgCoef);
 
                 channelUpdate(std::tuple<iChannel *, Attributes *, bool>(ch, atr, alive), channel->text());
+
+                _display->markersRecount();
             }
         }
     }
@@ -344,7 +451,7 @@ namespace oscilloscope {
 
     /// ИНДЕКС ЦВЕТА В СООТВЕТСТВИИ С ТАБЛИЦЕЙ
 
-    int SimpleScope::colorIndex(QColor color) const {
+    int SimpleScope::colorIndex(const QColor &color) const {
         if (color == Qt::black) return Enums::Colors::Black;
         else if (color == Qt::red) return Enums::Colors::Red;
         else if (color == Qt::blue) return Enums::Colors::Blue;
@@ -354,7 +461,7 @@ namespace oscilloscope {
 
     /// ОПРЕДЕЛЕНИЕ ЦВЕТА ПО ИНДЕКСУ В СООТВЕТСТВИИ С ТАБЛИЦЕЙ
 
-    QColor SimpleScope::colorByIndex(int index) const {
+    const QColor SimpleScope::colorByIndex(int index) const {
         if (index == Enums::Colors::Black) return Qt::black;
         else if (index == Enums::Colors::Red) return Qt::red;
         else if (index == Enums::Colors::Blue) return Qt::blue;
@@ -364,12 +471,14 @@ namespace oscilloscope {
 
     /// УДАЛЕНИЕ ГРАФИКА С ДИСПЛЕЯ
 
-    void SimpleScope::deleteChannel(QString name) {
+    void SimpleScope::deleteChannel(const QString &name) {
         _display->deleteGraph(name);
         _display->deleteGraph(name + "IMAG");
+
+        minMaxUpdate();
     }
 
-    void SimpleScope::deleteDublicates(QString name) {
+    void SimpleScope::deleteDublicates(const QString &name) {
         _display->deleteDublicatesGraph(name);
     }
 
@@ -390,14 +499,103 @@ namespace oscilloscope {
 
     }
 
+    /// ГЕТТЕР СТАТУСА ПАУЗЫ
+
+    bool SimpleScope::pause() const {
+        return _stop;
+    }
+
+    /// ПАУЗА ОБНОВЛЕНИЙ ДАННЫХ
+
+    void SimpleScope::setPause() {
+        _stop = !_stop;
+        if (_stop) _pauseAct->setText("Возобновить обновления");
+            else _pauseAct->setText("Остановить обновления");
+        updateTitle();
+    }
+
+    /// ФИЛЬТР СОБЫТИЙ
+
     bool SimpleScope::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::WindowDeactivate) {
-            if (object == this) {
+            if (object == this)
                 _display->keysReset();
-            }
+        } else if (event->type() == QEvent::Resize) {
+            if (object == this)
+                _display->resetMarkers();
         }
 
         return false;
+    }
+
+    /// ПЕРЕСЧЕТ МАРКЕРОВ
+
+    void SimpleScope::markersRecounted() {
+        QVector<QPointF *> points = _display->minAndMax();
+
+        ui->RealExpectedValue->setText(QString::number(_display->expectedValue().real(), 'f', 2));
+        ui->RealStandardDeviation->setText(QString::number(_display->standardDeviation().real(), 'f', 2));
+        ui->RealCapacity->setText(QString::number(_display->capacity().real(), 'f', 2));
+        ui->RealAmplitude->setText(QString::number(_display->amplitude().real(), 'f', 2));
+
+        ui->RealMinValue->setText(QString::number(points.at(0)->x(), 'f', 2) + " : " + QString::number(points.at(0)->y(), 'f', 2));
+        ui->RealMaxValue->setText(QString::number(points.at(2)->x(), 'f', 2) + " : " + QString::number(points.at(2)->y(), 'f', 2));
+
+        ui->ImagExpectedValue->setText(QString::number(_display->expectedValue().imag(), 'f', 2));
+        ui->ImagStandardDeviation->setText(QString::number(_display->standardDeviation().imag(), 'f', 2));
+        ui->ImagCapacity->setText(QString::number(_display->capacity().imag(), 'f', 2));
+        ui->ImagAmplitude->setText(QString::number(_display->amplitude().imag(), 'f', 2));
+
+        ui->ImagMinValue->setText(QString::number(points.at(1)->x(), 'f', 2) + " : " + QString::number(points.at(1)->y(), 'f', 2));
+        ui->ImagMaxValue->setText(QString::number(points.at(3)->x(), 'f', 2) + " : " + QString::number(points.at(3)->y(), 'f', 2));
+
+        ui->Amplitude->setText(QString::number(_display->complexAmplitude(), 'f', 2));
+
+        minMaxUpdate();
+    }
+
+    /// ОБНОВЛЕНИЕ ТОЧЕК ЭКСТРЕМУМА
+
+    void SimpleScope::minMaxUpdate() {
+        _display->deleteGraph("MinMaxPoint");
+
+        if (_display->minAndMax().size() > 0) {
+            LocalChannelListView * channelsView = _channels->channelsView();
+            QCheckBox *channel = dynamic_cast<QCheckBox *>(channelsView->itemWidget(channelsView->currentItem()));
+
+            if (channel->isChecked()) {
+                QVector<QPointF *> points = _display->minAndMax();
+
+                if (ui->RealMinPaint->isChecked() || ui->RealMaxPaint->isChecked() || ui->ImagMinPaint->isChecked() || ui->ImagMaxPaint->isChecked()) {
+                    QScatterSeries *series = new QScatterSeries();
+
+                    series->setName("MinMaxPoint");
+                    series->setUseOpenGL(false);
+                    series->setMarkerSize(10);
+
+                    if (ui->RealMinPaint->isChecked())
+                        series->append(points.at(0)->x(), points.at(0)->y());
+
+                    if (ui->RealMaxPaint->isChecked())
+                        series->append(points.at(2)->x(), points.at(2)->y());
+
+                    if (ui->ImagMinPaint->isChecked())
+                        series->append(points.at(1)->x(), points.at(1)->y());
+
+                    if (ui->ImagMaxPaint->isChecked())
+                        series->append(points.at(3)->x(), points.at(3)->y());
+
+                    _display->addGraph(series);
+                }
+            }
+        }
+    }
+
+    /// ОБНОВЛЕНИЕ ЗАГОЛОВКА
+
+    void SimpleScope::updateTitle() {
+        if (_stop) setWindowTitle(ui->DisplayName->text() + " [ПАУЗА]");
+            else setWindowTitle(ui->DisplayName->text());
     }
 
     /// ДЕСТРУКТОР

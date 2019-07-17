@@ -23,7 +23,7 @@ namespace oscilloscope {
 
     /// Удаление канала
 
-    void iChannelList::channelDelete(const QString name) {
+    void iChannelList::channelDelete(const QString &name) {
         emit channelDeleted(name);
 
         int index = indexByName(name);

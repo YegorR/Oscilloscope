@@ -18,20 +18,21 @@ namespace oscilloscope {
     protected:       
        QList<iChannel *> *_channels;
 
-       explicit iChannelList();
+       iChannelList();
 
     public:        
         QList<iChannel *> *channels() const;
 
         void add(iChannel *channel);
-        virtual int indexByName(const QString name) const = 0;
+        virtual int indexByName(const QString &name) const = 0;
+
         ~iChannelList();
 
     protected slots:
-        void channelDelete(const QString name);
+        void channelDelete(const QString &name);
 
     signals:
-        void channelDeleted(const QString name);
+        void channelDeleted(const QString &name);
 
     };
 }

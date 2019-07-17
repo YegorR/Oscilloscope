@@ -25,7 +25,8 @@ namespace oscilloscope {
 
         bool createTcpServer(quint16 port);
         bool createUdpServer(quint16 port);
-        void addRecordFrameParser(RecordFrameParser* parser);
+
+        void addRecordFrameParser(RecordFrameParser *parser);
 
     private slots:
         void receiveFrame(Frame *);
@@ -35,7 +36,7 @@ namespace oscilloscope {
         void reloadUdpServer();
 
     signals:
-        void channelUpdated(QString name);
+        void channelUpdated(const QString &name);
     };
 }
 

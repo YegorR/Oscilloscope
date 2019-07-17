@@ -12,7 +12,7 @@ namespace oscilloscope {
         QUdpSocket _socket;
 
     public:
-        UdpServer(quint16 port, QObject *parent = nullptr);
+        explicit UdpServer(quint16 port, QObject *parent = nullptr);
 
         bool start();
         void stop();

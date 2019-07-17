@@ -14,7 +14,7 @@ namespace oscilloscope {
         Q_OBJECT
 
     public:
-        ServerSettings(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+        explicit ServerSettings(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
 
     private:
         QGridLayout *_layout;

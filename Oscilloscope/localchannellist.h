@@ -15,12 +15,12 @@ namespace oscilloscope {
         Q_OBJECT
 
     public:
-        LocalChannelList(QLayout *parent = 0);
+        explicit LocalChannelList(QLayout *parent = 0);
 
         void add(DublicateChannel *channel);
-        void dublicatesDelete(const QString nameParent);
+        void dublicatesDelete(const QString &nameParent);
 
-        int indexByName(const QString name) const;
+        int indexByName(const QString &name) const;
 
         LocalChannelListView *channelsView() const;
 

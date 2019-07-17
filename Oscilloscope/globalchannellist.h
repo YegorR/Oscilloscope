@@ -15,22 +15,25 @@ namespace oscilloscope {
         Q_OBJECT
 
     public:
-        GlobalChannelList(QLayout *parent = 0);
+        explicit GlobalChannelList(QLayout *parent = 0);
 
         void add(iChannel *channel, bool alive = true);
-        int indexByName(const QString name) const;
+        int indexByName(const QString &name) const;
+        QListWidgetItem *getSelectedItem() const;
         iChannel *getSelectedChannel() const;
 
         ~GlobalChannelList();
 
     public slots:
         void channelUpdate(Channel *);
+        void currentItemChange(QListWidgetItem *oldItem, QListWidgetItem *newItem);
 
     private:
         GlobalChannelListView *_channelsView;
 
     signals:
-        void channelUpdated(QString name);
+        void channelUpdated(const QString &name);
+        void currentItemChanged(QListWidgetItem *oldItem, QListWidgetItem *newItem);
 
     };
 }

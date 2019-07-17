@@ -13,6 +13,7 @@ namespace oscilloscope {
 
         _invalidTimer = new QTimer();
         _invalidTimer->start(3600);
+
         connect(_invalidTimer, SIGNAL(timeout()), this, SLOT(channelDisconnected()));
 
         _invalidTimer->start();

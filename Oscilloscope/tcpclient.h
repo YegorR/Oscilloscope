@@ -12,8 +12,9 @@ namespace oscilloscope {
 
     private:
         QTcpSocket *_socket;
+
     public:
-        TcpClient(QTcpSocket* client, QObject* parent = nullptr);
+        explicit TcpClient(QTcpSocket* client, QObject* parent = nullptr);
 
         Frame *read();
 

@@ -15,7 +15,7 @@ namespace oscilloscope {
 
     /// СОЗДАНИЕ КАНАЛА (ДУБЛИКАТА) НА ОСНОВЕ УЖЕ СУЩЕСТВУЮЩЕГО КАНАЛА
 
-    iChannel::iChannel(const iChannel *channel) : iChannel(channel->dataStream()) {}
+    iChannel::iChannel(const iChannel *channel) : iChannel(channel->data()) {}
 
     /// ПОЛУЧЕНИЕ ТИПА КАНАЛА (ДУБЛИКАТ ИЛИ ОРИГИНАЛ)
 
@@ -25,7 +25,7 @@ namespace oscilloscope {
 
     /// ПОЛУЧЕНИЕ ДАННЫХ КАНАЛА
 
-    DataStream *iChannel::dataStream() const {
+    DataStream *iChannel::data() const {
         return _data;
     }
 
@@ -35,6 +35,10 @@ namespace oscilloscope {
         return _points;
     }
 
+    QVector<double> iChannel::offsetX() const {
+        return _offsetX;
+    }
+
     /// ПРЕОБРАЗОВАНИЕ ДАННЫХ В НУЖНЫЙ НАМ ВИД
 
     void iChannel::trigger(Enums::TriggersType type, double level) {
@@ -42,10 +46,24 @@ namespace oscilloscope {
         else if (type == Enums::TriggersType::TriggerByBackFront) _points = triggerByBackFront(_data->frame()->_points, level);
         else if (type == Enums::TriggersType::TriggerByTime) _points = triggerByTime(_data->frame()->_points, level, _data->frame()->_divXValue);
         else _points = _data->frame()->_points;
+
+        _offsetX = _data->frame()->_offsetX;
     }
 
     void iChannel::transform(Enums::TransformateType type, double expSmthCoef, int movingAvgCoef) {
-        if (type == Enums::TransformateType::BPF) _points = bpf(_points);
+        if (type == Enums::TransformateType::BPF) {
+            QVector<QVector<std::complex<double>>> vector = bpf(_points, _offsetX, _data->frame()->_divXValue);
+
+            _points = vector.at(0);
+
+            _offsetX.clear();
+
+            for (int i = 0; i < vector.at(1).size(); i++) {
+                _offsetX.push_back(vector.at(1).at(i).real());
+            }
+
+            return;
+        }
         else if (type == Enums::TransformateType::ThreePointFilter) _points = threePointFilter(_points);
         else if (type == Enums::TransformateType::ExponentialSmoothing) _points = expSmoothing(_points, expSmthCoef);
         else if (type == Enums::TransformateType::MovingAverage) _points = movingAvg(_points, movingAvgCoef);
@@ -57,26 +75,31 @@ namespace oscilloscope {
 
     /// ВНЕШНЯЯ ФУНКЦИЯ ПРЕОБРАЗОВАНИЯ БПФ
 
-    QVector<std::complex<double>> bpf(const QVector<std::complex<double>> &points) {
-        if (points.length() <= 0) return QVector<std::complex<double>>();
+    QVector<QVector<std::complex<double>>> bpf(const QVector<std::complex<double>> &p, const QVector<double> &x, double step) {
+        QVector<QVector<std::complex<double>>> vector;
 
-        QVector<std::complex<double>> vector;
+        QVector<std::complex<double>> points;
+        QVector<std::complex<double>> offsetX;
 
-        kiss_fft_cfg cfg = kiss_fft_alloc(points.size(), 0, 0, 0);
-        kiss_fft_cpx cx_in[points.size()], cx_out[points.size()];
+        if (p.length() <= 0) {
+            vector.push_back(points);
+            vector.push_back(offsetX);
 
-        for (int index = 0; index < points.size(); index++) {
-            cx_in[index].r = points.at(index).real();
-            cx_in[index].i = points.at(index).imag();
+            return vector;
         }
 
-        kiss_fft(cfg, cx_in, cx_out);
-        kiss_fft_free(cfg);
+        points = FFT::goFFT(p);
 
-        for (int index = 0; index < points.size(); index++) {
-            std::complex<double> point(cx_out[index].r, cx_out[index].i);
-            vector.push_back(point);
+        for (int i = 0; i < x.size() * step; i++)
+            offsetX.push_back(x.at(i) / (points.size() * step));
+
+        for (int i = 0; i < points.size(); i++) {
+            points[i].real(sqrt(points[i].real() * points[i].real() + points[i].imag() * points[i].imag()));
+            points[i].imag(0);
         }
+
+        vector.push_back(points);
+        vector.push_back(offsetX);
 
         return vector;
     }

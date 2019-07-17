@@ -15,8 +15,8 @@ namespace oscilloscope {
     public:
         explicit DublicateChannel(const Channel *channel);
 
-        QString name() const;
-        QString setName(QString name);
+        const QString name() const;
+        const QString setName(const QString &name);
 
     private:
         QString _name;

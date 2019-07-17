@@ -17,7 +17,7 @@ namespace oscilloscope {
         bool _alive;
 
     public:
-        Channel(DataStream *dataStream);
+        explicit Channel(DataStream *data);
 
         bool status() const;
 

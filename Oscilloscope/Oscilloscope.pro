@@ -25,9 +25,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    playrecordspeeddialog.cpp \
-    recorder.cpp \
-    recordframeparser.cpp \
     simplescope.cpp \
     globalchannellistview.cpp \
     localchannellistview.cpp \
@@ -50,13 +47,15 @@ SOURCES += \
     display.cpp \
     trigger.cpp \
     udpserver.cpp \
-    serversettings.cpp
+    serversettings.cpp \
+    marker.cpp \
+    markermeasurements.cpp \
+    recorder.cpp \
+    recordframeparser.cpp \
+    playrecordspeeddialog.cpp
 
 HEADERS += \
         mainwindow.h \
-    playrecordspeeddialog.h \
-    recorder.h \
-    recordframeparser.h \
     simplescope.h \
     globalchannellistview.h \
     localchannellistview.h \
@@ -76,13 +75,17 @@ HEADERS += \
     tcpclient.h \
     frameparser.h \
     kiss_fft.h \
-    _kiss_fft_guts.h \
     signalsmoothing.h \
     enums.h \
     display.h \
     trigger.h \
     udpserver.h \
-    serversettings.h
+    serversettings.h \
+    marker.h \
+    markermeasurements.h \
+    recorder.h \
+    recordframeparser.h \
+    playrecordspeeddialog.h
 
 FORMS += \
         mainwindow.ui \

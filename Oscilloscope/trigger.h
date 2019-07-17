@@ -4,13 +4,13 @@
 #include <QVector>
 #include <complex>
 
-
-class Trigger{
-public:
-    static QVector<std::complex<double>> triggerByForwardFront(QVector<std::complex<double>> data, double level, bool isReal);
-    static QVector<std::complex<double>> triggerByBackFront(QVector<std::complex<double>> data, double level, bool isReal);
-    static QVector<std::complex<double>> triggerByTime(QVector<std::complex<double>> data, double time, double step);
-};
-
+namespace oscilloscope {
+    class Trigger{
+    public:
+        static QVector<std::complex<double>> triggerByForwardFront(const QVector<std::complex<double>> &data, double level);       // Тригер по переднему фронту
+        static QVector<std::complex<double>> triggerByBackFront(const QVector<std::complex<double>> &data, double level);          // Тригер по заднему фронту
+        static QVector<std::complex<double>> triggerByTime(const QVector<std::complex<double>> &data, double time, double step);   // Тригер по времени
+    };
+}
 
 #endif // TRIGGER_H

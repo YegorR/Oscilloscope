@@ -24,7 +24,7 @@ namespace oscilloscope {
         virtual void itemDelete(QListWidgetItem *item) = 0;
 
     signals:
-        void channelDeleted(const QString name);
+        void channelDeleted(const QString &name);
     };
 }
 
