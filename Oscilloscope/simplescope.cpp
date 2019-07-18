@@ -348,6 +348,8 @@ namespace oscilloscope {
             QVector<std::complex<double>> points = channel->points();
             QVector<double> offsetX = channel->offsetX();
 
+            double divY = channel->data()->frame()->_divYValue;
+
             if (points.count() > 0) {
                 // ОТРИСОВКА ДЕЙСТВИТЕЛЬНОЙ ЧАСТИ
 
@@ -356,7 +358,7 @@ namespace oscilloscope {
                     series->setName(name);
 
                     for (int j = 0; j < points.size(); j++)
-                        series->append(offsetX.at(j), points.at(j).real());
+                        series->append(offsetX.at(j), points.at(j).real() * divY);
 
                     series->setUseOpenGL(false);
 
@@ -376,7 +378,7 @@ namespace oscilloscope {
                     series->setName(name + "IMAG");
 
                     for (int j = 0; j < points.size(); j++)
-                        series->append(offsetX.at(j), points.at(j).imag());
+                        series->append(offsetX.at(j), points.at(j).imag() * divY);
 
                     series->setUseOpenGL(false);
 
